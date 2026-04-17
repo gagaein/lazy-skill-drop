@@ -42,11 +42,11 @@ FORBIDDEN   = SKILL_ROOT / "references" / "anti-ai-patterns.md"
 PASS_THRESHOLD = 0.70
 
 DEFAULT_FORMULA = {
-    "hook_words_target":       10,
-    "hook_words_tolerance":    3,
-    "install_line_target":     8,
+    "hook_words_target":       12,    # real data: 12.1 install-weighted (was 10)
+    "hook_words_tolerance":    4,
+    "install_line_target":     2,     # real data: ALL top skills put install on line 2 (was 8!)
     "install_line_tolerance":  2,
-    "readme_length_target":    247,
+    "readme_length_target":    210,   # real data: 209 install-weighted (was 247)
     "readme_length_tolerance": 60,
     "description_max":         120,
 }
@@ -71,19 +71,26 @@ WORKFLOW_SUMMARY_VERBS = {
 }
 
 DIM_WEIGHTS = {
-    # viral-formula-driven — apply to README.md only (55% — takes precedence over anti-ai per SKILL.md precedence)
-    "hook_quality":         0.25,   # target: README.md
-    "install_position":     0.15,   # target: README.md
-    "word_count":           0.15,   # target: README.md
-    # obra description principle — apply to SKILL.md frontmatter only (15% — critical for metadata matching)
-    "description_triggers": 0.15,   # target: SKILL.md frontmatter
-    # supporting signals
-    "description_length":   0.05,   # target: SKILL.md frontmatter
-    "forbidden_words":      0.10,   # target: BOTH README.md + SKILL.md (anti-ai secondary)
-    "banned_headers":       0.05,   # target: README.md (anti-ai secondary)
-    "burstiness":           0.05,   # target: README.md (weak signal per Pangram research)
-    "token_budget":         0.05,   # target: SKILL.md + references (self-evolution guard)
-}
+    # ── Regression-calibrated weights (w2026-17, n=40, R²=0.69, LogReg acc=92.5%) ──
+    #
+    # Key changes vs seed weights:
+    #   install_position  0.15 → 0.30  ← strongest binary predictor (LogReg 0.467)
+    #   word_count        0.15 → 0.20  ← highest OLS coefficient (2.87), sweet-spot matters
+    #   hook_quality      0.25 → 0.15  ← still top-3 but was overweighted
+    #   banned_headers    0.05 → 0.00  ← near-zero signal in both models (LogReg 0.001);
+    #                                     still scored and shown in output, not counted
+    #   token_budget kept at 0.05 as operational guard (not in regression sample)
+    # Sum = 1.00
+    "install_position":     0.30,   # target: README.md — #1 binary predictor
+    "word_count":           0.20,   # target: README.md — #1 OLS predictor (sweet spot ~210w)
+    "hook_quality":         0.15,   # target: README.md — important but was over-indexed
+    "description_triggers": 0.15,   # target: SKILL.md frontmatter — unchanged
+    "forbidden_words":      0.10,   # target: README + SKILL.md — unchanged (negative OLS coeff)
+    "description_length":   0.05,   # target: SKILL.md frontmatter — weak but non-zero
+    "token_budget":         0.05,   # target: SKILL.md + refs — operational guard, not in regression
+    "burstiness":           0.00,   # informational only — LogReg 0.036, below threshold
+    "banned_headers":       0.00,   # informational only — LogReg 0.001, no predictive value
+    # Sum = 1.00
 # Sum = 1.00
 # Scorer signature encodes target file:
 #   score_X(readme_text, ...)      → looks at README only

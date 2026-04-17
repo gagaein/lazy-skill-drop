@@ -62,3 +62,20 @@ bullet_count:    4.0
 - "craft"         in 2/10
 
 ────────────────────────────────────────
+
+────────────────────────────────────────
+
+## w2026-17 (real-data rescan)
+
+### structural
+hook_words:      12.1
+install_line:    2.0
+readme_length:   209
+hook_type:       command (7/11)
+bullet_count:    11.5
+
+### forbidden_seen
+- "seamless"      in 4/10
+- "leverage"      in 3/10
+- "comprehensive" in 3/10
+
