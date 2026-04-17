@@ -91,7 +91,7 @@ DIM_WEIGHTS = {
     "burstiness":           0.00,   # informational only — LogReg 0.036, below threshold
     "banned_headers":       0.00,   # informational only — LogReg 0.001, no predictive value
     # Sum = 1.00
-# Sum = 1.00
+}
 # Scorer signature encodes target file:
 #   score_X(readme_text, ...)      → looks at README only
 #   score_X(skill_md_text, ...)    → looks at SKILL.md only
@@ -201,9 +201,19 @@ def score_hook(readme_text: str, formula: dict) -> tuple[float, str]:
     hook = None
     for line in lines[1:]:
         s = line.strip()
-        if s and not s.startswith("#") and not s.startswith("```") and not s.startswith("_"):
-            hook = s
-            break
+        if not s:
+            continue
+        # skip structural non-hook lines
+        if s.startswith(("#", "```", "_", "!")):
+            continue
+        # skip install/shell command lines ($ cmd, /plugin, npx, git clone, brew, pip,
+        # or inline-code-only lines like `git clone ...`)
+        first_word = s.split()[0].lower().lstrip("`$")
+        if first_word in ("npx", "git", "pip", "brew", "npm", "curl", "wget",
+                          "/plugin", "claude-code") or s.startswith(("$", "/", "`git", "`npx")):
+            continue
+        hook = s
+        break
     if not hook:
         return 0.0, "no hook line found"
 
