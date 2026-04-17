@@ -1,0 +1,69 @@
+name: Weekly evolution
+
+on:
+  schedule:
+    - cron: "0 9 * * MON"   # every Monday 9:00 AM UTC
+  workflow_dispatch:          # allow manual trigger from GitHub UI
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  evolve:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0       # need full history for delta comparison
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Scan GitHub trending
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd ${{ github.workspace }}
+          python scripts/scan.py --token "$GITHUB_TOKEN"
+
+      - name: Compute drift
+        id: delta
+        run: |
+          cd ${{ github.workspace }}
+          python scripts/delta.py --json > /tmp/delta.json
+          cat /tmp/delta.json
+          STATUS=$(python -c "import json,sys; d=json.load(open('/tmp/delta.json')); print(d['status'])")
+          SCORE=$(python  -c "import json,sys; d=json.load(open('/tmp/delta.json')); print(d['drift_score'])")
+          echo "status=$STATUS"  >> $GITHUB_OUTPUT
+          echo "score=$SCORE"    >> $GITHUB_OUTPUT
+
+      - name: Commit knowledge layer update
+        if: steps.delta.outputs.status != 'STABLE'
+        run: |
+          git config user.name  "lazy-skill-drop[bot]"
+          git config user.email "bot@lazy-skill-drop"
+          git add references/viral-patterns.md references/formula-history.md
+          git diff --cached --quiet || git commit -m "chore(knowledge): update viral-patterns ${{ steps.delta.outputs.status }} score=${{ steps.delta.outputs.score }}"
+
+      - name: Propose capability changes
+        if: steps.delta.outputs.status != 'STABLE'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd ${{ github.workspace }}
+          python scripts/propose.py
+
+      - name: Push knowledge layer changes (direct push on STABLE or DRIFT auto)
+        if: steps.delta.outputs.status == 'STABLE'
+        run: |
+          git push origin main || echo "Nothing to push"
+
+      - name: Summary
+        run: |
+          echo "## Evolution Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status:** ${{ steps.delta.outputs.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Drift score:** ${{ steps.delta.outputs.score }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Run at:** $(date -u)" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,8 @@
+# This directory is populated at runtime by publish.py and propose.py:
+#
+#   performance-log.md   — one line per skill published, for outcome tracking
+#   pr-bodies.md         — pre-written awesome-list PR bodies from last publish
+#   evolution-log.md     — audit trail of capability-layer changes over time
+#
+# These files are gitignored except for this .gitkeep, so the directory exists
+# but stays empty on fresh clones.

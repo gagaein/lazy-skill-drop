@@ -1,0 +1,23 @@
+# Normalize all text files to LF on commit. Prevents Windows users'
+# core.autocrlf setting from flipping line endings in SKILL.md and
+# scripts/*, which would show as massive diffs in awesome-list PRs.
+
+* text=auto eol=lf
+
+# Explicit lock on file types that must stay LF regardless of
+# platform defaults:
+*.py   text eol=lf
+*.md   text eol=lf
+*.json text eol=lf
+*.yml  text eol=lf
+*.yaml text eol=lf
+*.sh   text eol=lf
+*.html text eol=lf
+*.css  text eol=lf
+*.js   text eol=lf
+
+# Binary (don't touch):
+*.png  binary
+*.jpg  binary
+*.zip  binary
+*.gif  binary
