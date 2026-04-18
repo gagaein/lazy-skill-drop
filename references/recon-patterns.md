@@ -99,13 +99,4 @@ Write `{verdict, top-3 adjacent with bucket+status, moats Y/N/Partial × 5, posi
 When Recon says SATURATED but the user insists, do not block. Log override.
 When viral-patterns says "short hook" but Recon position_statement needs length, keep position_statement above the hook, don't squeeze it in.
 
-## Future work
 
-- Install count replaces ⭐ as primary signal (Primary: ClawHub install → Secondary: GH release downloads → Fallback: ⭐). Deferred until scan.py runs live and confirms signal scarcity across 20+ real candidates.
-
-## Sources
-
-- VoltAgent/awesome-claude-code-subagents — competitive-analyst subagent structure (direct vs indirect framing, intelligence-gathering taxonomy)
-- superamped/ai-marketing-skills — direct/adjacent/tangential 3-tier, cross-ecosystem manifesto ("any tool that reads AGENTS.md")
-- phuryn/porters-five-forces — standalone Porter skill reinforces Moats as community-validated need; we ship lightweight 5-item version
-- alirezarezvani/claude-skills — cross-ecosystem evidence: 12 AI coding agents supported (Claude Code, Codex, Gemini CLI, Cursor, Aider, Windsurf, Kilo Code, OpenCode, Augment, Antigravity, Hermes, OpenClaw)

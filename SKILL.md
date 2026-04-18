@@ -19,11 +19,9 @@ Discuss the idea. lazydrop handles everything else.
 
 ---
 
-## Python invocation (cross-platform)
+## Python invocation
 
-All scripts in this skill are invoked via `python3` in the examples below. On Windows, `python3` may not be on PATH — use `python` instead. On macOS and most Linux distros, `python` often points to Python 2 or is missing entirely; use `python3`.
-
-If a command like `python3 scripts/X.py` fails with "command not found", try `python scripts/X.py`. Do this silently without bothering the user — it's a one-off PATH check, not something they need to see.
+Use `python3 scripts/X.py`. On Windows try `python` if `python3` fails. Do this silently.
 
 ---
 
@@ -121,21 +119,93 @@ If verdict is `HEAD_ON_COLLISION` and Moats checklist has ≤1 Yes, surface this
 
 Read `references/naming-patterns.md`. If the extracted skill already has a name in the conversation, skip — use that name.
 
-Otherwise, generate 3 candidates using the 6 semantic structures, pick one by the 10-item checklist. The chosen name becomes the repo slug in Phase E.
+Otherwise, generate 3 candidates using the 6 semantic structures, pick one by the pre-ship checklist. The chosen name becomes the repo slug in Phase E.
+
+---
+
+## Phase C — Position (one sentence, the backbone)
+
+**This sentence is the skeleton. Everything written in Phase B traces back to it.**
+
+Using the Recon verdict and top-3 adjacent tools from `memory/recon-log.md`, forge one positioning sentence. Template by verdict:
+
+```
+CROWDED_BUT_DIFFERENTIABLE:
+  "{adj1} and {adj2} do [A] but assume [B]. This one does [B] directly."
+  "{adj1} lets you [X] but skips [Y]. {adj2} does [Y] but requires [Z]. This does both."
+
+EMERGING:
+  "Built for [wedge] — the part of [category] no existing skill handles yet."
+
+UNCLAIMED:
+  "[Problem] has no dedicated skill. This is the first one built around [specific constraint]."
+
+SATURATED:
+  "Every [category] skill does [A]. This one does [A] and [specific differentiator] in one pass."
+```
+
+Rules for the sentence:
+- Name the top 1-2 competitors explicitly — vague "other tools" is weaker
+- Name their specific limitation, not just "they don't do X"
+- The sentence must fit in one breath — if it needs a semicolon to survive, it's two sentences
+- Do NOT fabricate competitor limitations. If you can't name a real one, use the UNCLAIMED template instead
+
+Show the sentence to the user as:
+
+```
+Positioning: "{sentence}"
+
+This is the backbone — README hook, SKILL.md description, and bullet copy
+will all be written to support this claim. Change it now if it's wrong.
+```
+
+Then ask: **"Positioning locked? (y / change it)"**
+
+- `y` → proceed to Phase B with this sentence as anchor
+- change → rewrite and ask again
+- If verdict is `HEAD_ON_COLLISION` with ≤1 moat: surface the collision before asking.
 
 ---
 
 ## Phase B — Forge (apply current formula)
 
-Read `references/viral-patterns.md`. Build the README structure per current week's formula.
-(See original v1 doc for the structure table — unchanged.)
+Read `references/viral-patterns.md` + `references/readme-rules.md` (B1) and `references/skill-md-rules.md` (B2).
+
+**The Phase C positioning sentence is the first constraint.** Hook, bullets, and SKILL.md description must all support it. If a bullet contradicts or ignores the positioning, cut it.
+
+### B1 — Forge README.md
+
+Build per current week's viral formula. Place positioning sentence as the first prose line after the 4-bullet summary (or as the hook if it fits the word count).
+
+### B2 — Forge SKILL.md
+
+Write description field to trigger on the same user pain the positioning names. Do not summarize the mechanism — trigger on the symptom.
 
 ---
 
-## Phase C — Polish (anti-AI two-pass)
+## Phase P — Polish (anti-AI two-pass)
 
 Read `references/anti-ai-patterns.md` for the current forbidden word list.
-(See original v1 doc for pass 1 structural + pass 2 language rules — unchanged.)
+
+**Pass 1 — structural:**
+- Delete section headers named: Overview, Introduction, Features, Getting Started
+- Bullet list >4 items → convert to 2 sentences of prose (unless it's a rules-directory skill)
+- Delete sentences starting with "This skill"
+- Delete "whether you're X or Y" constructions
+
+**Pass 2 — language:**
+- Replace Tier 1 forbidden words with specific numbers or examples
+- Every adjective claim must have a number or example backing it
+- Check first line: must start with a verb or be a question
+
+**Self-check:**
+```
+✓ Positioning sentence survives intact into final README
+✓ Hook is ≤16 words, verb-first
+✓ Install command on line 2-3
+✓ No Tier 1 forbidden words
+✓ Word count 350–450
+```
 
 ---
 
@@ -235,9 +305,10 @@ When rules from different reference files conflict, resolve top-down:
 | 2 | `naming-patterns.md` | High |
 | 3 | `extract-patterns.md` (Phase A required fields) | High |
 | 4 | `recon-patterns.md` (verdict → strategy mapping) | High |
-| 5 | `anti-ai-patterns.md` Tier 1 (hard red flags) | Medium |
-| 6 | `anti-ai-patterns.md` Tier 2/3 (soft signals) | Low |
-| 7 | Rhythm / burstiness checks | Lowest |
+| 5 | Phase C positioning sentence (backbone constraint for Phase B) | High |
+| 6 | `anti-ai-patterns.md` Tier 1 (hard red flags) | Medium |
+| 7 | `anti-ai-patterns.md` Tier 2/3 (soft signals) | Low |
+| 8 | Rhythm / burstiness checks | Lowest |
 
 **In plain terms:** match the current viral formula first. Anti-AI patterns
 are filters to run *after* the structure is right, not constraints that
@@ -263,8 +334,10 @@ Rules derived from Anthropic skill-creator SKILL.md and obra/superpowers.
 
 ### Phase B splits into B1 + B2
 
-- Phase B1 → Forge README.md. Read `viral-patterns.md` + `readme-rules.md`.
-- Phase B2 → Forge SKILL.md. Read `skill-md-rules.md`.
+Both are anchored to the Phase C positioning sentence.
+
+- Phase B1 → Forge README.md. Read `viral-patterns.md` + `readme-rules.md`. Positioning sentence goes in first prose line after 4-bullet summary.
+- Phase B2 → Forge SKILL.md. Read `skill-md-rules.md`. Description triggers on the pain the positioning names.
 
 ---
 
@@ -277,13 +350,13 @@ All reference files are AI-operational: rules only, no citations, no methodology
 | `references/viral-patterns.md` | Phase B1 (Forge README) — always |
 | `references/readme-rules.md` | Phase B1 (Forge README) — always |
 | `references/skill-md-rules.md` | Phase B2 (Forge SKILL.md) — always |
-| `references/anti-ai-patterns.md` | Phase C (Polish) — always |
+| `references/anti-ai-patterns.md` | Phase P (Polish) — always |
 | `references/naming-patterns.md` | Phase N (Name) — when naming a new skill |
-| `references/recon-patterns.md` | Phase R (Recon) — before Phase B |
+| `references/recon-patterns.md` | Phase R (Recon) — before Phase C |
 | `references/extract-patterns.md` | Phase A (Extract) — always |
 | `references/formula-history.md` | Phase B when predicting trend |
 | `memory/performance-log.md` | On activation (startup) |
-| `memory/recon-log.md` | On propose.py runs |
+| `memory/recon-log.md` | Phase C (Position) — read to pull verdict + top adjacent |
 | `memory/evolution-log.md` | Only when debugging evolution |
 | `memory/pr-bodies.md` | Only when user asks to see PR text |
 
