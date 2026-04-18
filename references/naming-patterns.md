@@ -2,107 +2,112 @@
 max_lines: 90
 version: w2026-17
 role: AI-operational
+protected: true
+evolution: naming-only section is AUTO-UPDATED by scan.py; core-principles section is PROTECTED
 ---
 
 # Naming Patterns
 
-Claude skill names live in two contexts simultaneously — optimizing only one produces bad names.
+## When to run this phase
 
-**Context 1 — Discovery** (skills.sh slug, GitHub URL, awesome-list):
-Scanned quickly. Must signal category and scope fast. Short wins.
+**After Phase C (Position) is confirmed, before Phase B (Forge).**
 
-**Context 2 — Activation** (user says it in conversation, description field triggers):
-Must feel natural to say aloud and appear in the phrases users actually reach for.
-Names that are awkward to speak ("readme-forge" requires a pause) fail here.
+The positioning sentence tells you three things a name should reflect:
+1. What pain you address (from `problem` field)
+2. Which competitors you beat and how (from the positioning sentence itself)
+3. What the user will say when they need you (from the activation context)
 
----
-
-## Scope honesty rule
-
-**Name the outcome, not the mechanism.**
-
-For a multi-phase pipeline (research → generate → audit → ship → evolve):
-- Bad: `readme-forge` — names one middle step
-- Bad: `skill-publisher` — names the last step only
-- Good: names that capture "from idea to live, automatically"
-
-If the product is a pipeline, the name should feel like a pipeline noun, not a tool noun.
-Verb-noun works for single-function utilities; metaphor or portmanteau works better for
-full pipelines because a single verb undersells scope.
+A name generated before positioning is guesswork. A name generated after positioning
+can encode the differentiation directly.
 
 ---
 
-## Six semantic structures
+## This skill's core innovations (anchor for self-naming)
 
-| Structure | Share | Best when |
-|---|---|---|
-| verb-noun | 35% | Single function is the draw (find-skills, code-review) |
-| single-metaphor | 20% | Product is hard to describe but easy to feel (superpowers) |
-| domain-noun | 20% | SEO matters; audience is domain-defined (frontend-design) |
-| portmanteau | 10% | Need a unique brand handle (skilldrop) |
-| domain-skill suffix | 10% | Collection repos only, NOT single skills (aws-skills) |
-| ironic | 5% | Product 10x better than name implies (lazy-skill-drop) |
+This section exists so naming decisions for *this skill itself* are grounded in
+what makes it genuinely different. Read it before naming Phase N for any skill —
+it's the reference point for "what a full-pipeline naming decision looks like."
 
----
+**What this skill does that nothing else does:**
+- Scans the real leaderboard weekly — formula is rebuilt from install data, not frozen in January
+- Runs full pipeline: Recon → Position → Name → README + SKILL.md → Audit → Publish → Evolve
+- Self-audits its own output on the same rules it applies to others
+- Zero-form UX — extracts everything from conversation, never asks what you already said
+- Velocity moat — weekly self-update means static competitors always lag
 
-## Forbidden
+**What a name for this skill should NOT do:**
+- Name one step (readme-forge names B1 only, scan-forge names R only)
+- Sound like a generator or template tool (misrepresents the pipeline scope)
+- Require insider knowledge to understand (recon-log means nothing to a first-time user)
 
-- Hook verbs as first word: stop, skip, drop, turn, ship (reserved for README hooks, not names)
-- Tier 1 AI slop: viral, ultimate, amazing, revolutionary, smart, ai-powered
-- Weak suffixes unless literally accurate: -skill, -skills, -tool, -tools, -cli
-- Version numbers or years
-
-These are mechanical filters. A name passing all of them can still be wrong.
-
----
-
-## Memorability (3 questions, all "yes" required)
-
-1. Say it aloud without hesitation?
-2. Spell it from hearing once?
-3. Hooks to a single clear concept — metaphor, action, place?
+**What a name for this skill SHOULD do:**
+- Signal "idea → published" completeness
+- Feel like a verb when used in a sentence ("skilldrop this", "dispatch my skill")
+- Be pronounceable on first read without pause
 
 ---
 
-## Activation test (Claude-specific)
+## Viral naming patterns (AUTO-UPDATED by scan.py weekly)
 
-Would a user naturally say this in a sentence when they want the skill?
-- "lazydrop my skill" — works as verb, memorable ✓
-- "use scan-forge on this" — awkward, sounds like a command ✗
+<!-- SCAN_SECTION_START — do not edit below this line manually -->
+**Week:** w2026-17 | **Sample:** top-20 skills by install count
 
-For skills invoked by intent rather than name: test the description trigger instead.
+### Structure distribution (top-20)
+
+| Structure | Count | Share | Examples |
+|---|---|---|---|
+| domain-noun | 7 | 35% | frontend-design, web-design-guidelines, vercel-react-best-practices |
+| verb-noun | 5 | 25% | find-skills, skill-creator, code-review |
+| brand-prefixed | 4 | 20% | microsoft-foundry, remotion-best-practices, vercel-composition-patterns |
+| portmanteau / single-word | 3 | 15% | soultrace, brainstorming, agent-browser |
+| ironic | 1 | 5% | superpowers |
+
+### What correlates with high install velocity this week
+
+- **Brand-prefixed names** (microsoft-, vercel-, remotion-) dominate top-5 — but this is org authority, not naming quality. Not replicable for solo skills.
+- **Exact function names** among solo skills: find-skills (1.1M), skill-creator (152K) — win when the function IS the differentiator.
+- **Single-word/portmanteau** with strong identity: soultrace (132K) works because it names the experience, not the mechanism.
+- **Short beats long** among solo skills: 1-2 word names outperform 3+ word names at equivalent authority level.
+
+### Direction: what tends to produce hits (not rules)
+
+Pick one of these directions — they're listed by how often they correlate with velocity:
+
+1. **Exact function, verb-first** — works when your differentiator IS the function. `find-skills`, `skill-creator`. If you do ONE thing extremely well, name that thing.
+2. **Experience/metaphor, single word** — works when the differentiator is how it *feels*, not what it does. `soultrace`, `superpowers`, `caveman`. The name creates an identity.
+3. **Domain-noun, clear audience** — works when SEO matters more than brand. `frontend-design`, `web-design-guidelines`. Discovery-optimized, low memorability.
+4. **Verb used as noun** — tight portmanteau or single verb that can be used in a sentence. `skilldrop`, `dispatch`. Works when the action IS the product.
+
+Avoid: names that describe an internal mechanism the user never sees (scan-forge, readme-factory). If a user would never say that phrase when they need the skill, the name is too internal.
+
+<!-- SCAN_SECTION_END -->
 
 ---
 
-## Scope calibration
+## Competitor check (from recon-log.md)
 
-| Product scope | Name guidance |
-|---|---|
-| Single-function utility | verb-noun; name the function directly |
-| Multi-step workflow | metaphor or portmanteau; name the outcome |
-| Full pipeline | metaphor wins; the name is a brand, not a description |
-| Official / org-backed | 1-word or tight kebab |
-| Experimental / personal | ironic or metaphor OK; don't LARP authority |
+Before locking a name, read `memory/recon-log.md` top-3 adjacent skills.
+
+Check two things:
+1. **Name collision** — does any top adjacent have a similar name? If yes, the name creates confusion even if the product is different. Pick a new direction.
+2. **Name differentiation** — does your name signal something different from theirs? If they're called `brand-design-md` and `design-chooser`, a name like `design-md-picker` is too close. Go a level up in abstraction or pick a different metaphor.
 
 ---
 
-## Pre-ship checklist (gut-check, not binary filter)
+## Gut-check (3 questions)
 
-A name scoring 7/10 feeling right > 10/10 feeling wrong.
+These are questions, not pass/fail gates.
 
-- [ ] Both contexts work (discovery + activation)
-- [ ] Scope honest — name doesn't imply narrower function than product delivers
-- [ ] 1-3 words, pronounceable, spellable from hearing
-- [ ] No Tier 1 forbidden words or weak-signal suffix
-- [ ] No hook verbs
-- [ ] GitHub top 3 in category not same-bucket competitor with this name
-- [ ] Memorable anchor: metaphor, concept, or distinctive sound
-- [ ] Natural in a sentence (activation test passes)
+1. **Can you say it as a verb in a sentence?** "Let me {name} this skill idea" — does it work naturally?
+2. **Does it name the outcome or a step?** If it names a step, you're underselling. Go broader.
+3. **Would someone search for this name to find this skill?** If not, will they find it anyway via the problem description?
 
 ---
 
-## Project-stage match
+## Protected note
 
-- Anthropic / major org: 1-word or tight kebab, no irony
-- Community-established (>500⭐): verb-noun, credibility signal  
-- Experimental / personal: metaphor or ironic fine; matches actual authority level
+This file has two zones:
+- **Core principles** (everything outside the `SCAN_SECTION`) — PROTECTED. The evolution loop does not modify these. They encode durable reasoning, not market data.
+- **Viral patterns section** (between SCAN_SECTION markers) — AUTO-UPDATED by scan.py. The formula numbers and structure distribution change weekly.
+
+If propose.py ever suggests removing a core principle section, that proposal should be REJECTED. The scan section is the only part that evolves.

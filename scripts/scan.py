@@ -277,6 +277,94 @@ def aggregate(repo_dnas: list[dict]) -> dict:
 ISO_WEEK = datetime.now(timezone.utc).strftime("w%Y-%V")
 GENERATED_AT = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
+NAMING_OUT  = SKILL_ROOT / "references" / "naming-patterns.md"
+SCAN_START  = "<!-- SCAN_SECTION_START — do not edit below this line manually -->"
+SCAN_END    = "<!-- SCAN_SECTION_END -->"
+
+
+def classify_name_structure(name: str) -> str:
+    parts = name.lower().split("-")
+    known_brands = {"vercel","microsoft","anthropic","remotion","google",
+                    "github","aws","azure","openai","cloudflare"}
+    if parts[0] in known_brands:
+        return "brand-prefixed"
+    if len(parts) == 1:
+        return "portmanteau"
+    verb_indicators = {"find","create","build","run","fix","review","write",
+                       "check","scan","audit","design","forge","pick","ship"}
+    if len(parts) == 2 and parts[0] in verb_indicators:
+        return "verb-noun"
+    return "domain-noun"
+
+
+def render_naming_section(repos: list[dict], week: str) -> str:
+    """Render the SCAN_SECTION for naming-patterns.md. Only this block auto-updates."""
+    from collections import defaultdict
+    struct_dna: dict = defaultdict(list)
+    for repo in repos:
+        slug = repo.get("name", repo.get("full_name","").split("/")[-1])
+        struct_dna[classify_name_structure(slug)].append(slug)
+
+    n = len(repos)
+    rows = []
+    for struct in ["domain-noun","verb-noun","brand-prefixed","portmanteau"]:
+        names = struct_dna.get(struct, [])
+        cnt   = len(names)
+        share = f"{round(cnt/n*100)}%" if n else "0%"
+        examples = ", ".join(names[:3]) if names else "—"
+        rows.append(f"| {struct:<20} | {cnt:>5} | {share:>5} | {examples} |")
+    table = "\n".join(rows)
+
+    velocity_repos = sorted(repos, key=lambda r: r.get("star_velocity", 0), reverse=True)[:3]
+    velocity_str = ", ".join(
+        r.get("name", r.get("full_name","").split("/")[-1]) for r in velocity_repos
+    ) or "n/a"
+
+    return f"""{SCAN_START}
+**Week:** {week} | **Sample:** top-{n} skills by install count
+
+### Structure distribution (top-{n})
+
+| Structure            | Count | Share | Examples |
+|---|---|---|---|
+{table}
+
+### High-velocity names this week (fastest growing)
+
+{velocity_str}
+
+### Direction: what tends to produce hits
+
+1. **Exact function, verb-first** — works when your differentiator IS the function (`find-skills`, `skill-creator`). Name the thing you do if you do ONE thing extremely well.
+2. **Experience/metaphor, single word** — works when the differentiator is how it *feels* (`soultrace`, `superpowers`). Creates identity, not description.
+3. **Domain-noun, clear audience** — SEO-optimized, high discovery, lower memorability (`frontend-design`, `web-design-guidelines`).
+4. **Tight portmanteau / verb-as-noun** — works when the action IS the product (`skilldrop`, `dispatch`). Must pass: "let me {{name}} this skill."
+
+Avoid names that describe an internal step the user never sees (scan-forge, readme-factory).
+
+{SCAN_END}"""
+
+
+def update_naming_patterns(repos: list[dict], dry_run: bool):
+    """Replace SCAN_SECTION in naming-patterns.md. Core principles section is NEVER touched."""
+    import sys
+    if not NAMING_OUT.exists():
+        print(f"  [warn] {NAMING_OUT} not found — skipping", file=sys.stderr)
+        return
+    text = NAMING_OUT.read_text(encoding="utf-8")
+    s, e = text.find(SCAN_START), text.find(SCAN_END)
+    if s == -1 or e == -1:
+        print("  [warn] naming-patterns.md missing SCAN markers — skipping", file=sys.stderr)
+        return
+    new_section = render_naming_section(repos, ISO_WEEK)
+    new_text = text[:s] + new_section + text[e + len(SCAN_END):]
+    if dry_run:
+        print("── naming SCAN_SECTION (dry run) ──")
+        print(new_section[:500])
+        return
+    NAMING_OUT.write_text(new_text, encoding="utf-8")
+    print(f"  ✓ updated SCAN_SECTION in {NAMING_OUT.name}")
+
 
 def render_patterns(agg: dict, repos: list[dict]) -> str:
     def frac(count, total):
@@ -454,6 +542,7 @@ def main():
     write_patterns(content, args.dry_run)
     enforce_patterns_length(args.dry_run)
     append_history(content, args.dry_run)
+    update_naming_patterns(repos, args.dry_run)
     update_last_scanned(args.dry_run)
 
     print("[scan] done.")

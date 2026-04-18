@@ -44,8 +44,14 @@ jobs:
         run: |
           git config user.name  "lazy-skill-drop[bot]"
           git config user.email "bot@lazy-skill-drop"
-          git add references/viral-patterns.md references/formula-history.md
-          git diff --cached --quiet || git commit -m "chore(knowledge): update viral-patterns ${{ steps.delta.outputs.status }} score=${{ steps.delta.outputs.score }}"
+          # PROTECTED FILES — never auto-commit these:
+          #   SKILL.md (body/phases), references/naming-patterns.md (core-principles),
+          #   references/anti-ai-patterns.md, references/skill-md-rules.md,
+          #   references/readme-rules.md, references/recon-patterns.md,
+          #   references/extract-patterns.md
+          # AUTO-UPDATE scope (knowledge layer only):
+          git add references/viral-patterns.md references/formula-history.md references/naming-patterns.md
+          git diff --cached --quiet || git commit -m "chore(knowledge): update knowledge layer ${{ steps.delta.outputs.status }} score=${{ steps.delta.outputs.score }}"
 
       - name: Propose capability changes
         if: steps.delta.outputs.status != 'STABLE'

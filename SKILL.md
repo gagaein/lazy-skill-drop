@@ -115,17 +115,9 @@ If verdict is `HEAD_ON_COLLISION` and Moats checklist has ≤1 Yes, surface this
 
 ---
 
-## Phase N — Name (semantic naming)
-
-Read `references/naming-patterns.md`. If the extracted skill already has a name in the conversation, skip — use that name.
-
-Otherwise, generate 3 candidates using the 6 semantic structures, pick one by the pre-ship checklist. The chosen name becomes the repo slug in Phase E.
-
----
-
 ## Phase C — Position (one sentence, the backbone)
 
-**This sentence is the skeleton. Everything written in Phase B traces back to it.**
+**This sentence is the skeleton. Everything written in Phase B — and the name in Phase N — traces back to it.**
 
 Using the Recon verdict and top-3 adjacent tools from `memory/recon-log.md`, forge one positioning sentence. Template by verdict:
 
@@ -155,15 +147,26 @@ Show the sentence to the user as:
 ```
 Positioning: "{sentence}"
 
-This is the backbone — README hook, SKILL.md description, and bullet copy
-will all be written to support this claim. Change it now if it's wrong.
+This is the backbone — README hook, SKILL.md description, bullet copy,
+and the skill name will all be written to support this claim.
+Change it now if it's wrong.
 ```
 
 Then ask: **"Positioning locked? (y / change it)"**
 
-- `y` → proceed to Phase B with this sentence as anchor
+- `y` → proceed to Phase N with this sentence as context
 - change → rewrite and ask again
 - If verdict is `HEAD_ON_COLLISION` with ≤1 moat: surface the collision before asking.
+
+---
+
+## Phase N — Name (semantic naming)
+
+Read `references/naming-patterns.md`. If the extracted skill already has a name in the conversation, skip — use that name.
+
+**The positioning sentence from Phase C is the primary input.** The name should reflect the differentiation, not describe a mechanism.
+
+Generate 3 candidates, one per direction from naming-patterns.md viral section. For each, apply the gut-check questions from naming-patterns.md. Pick one. The chosen name becomes the repo slug in Phase E.
 
 ---
 
