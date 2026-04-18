@@ -22,28 +22,27 @@ can encode the differentiation directly.
 
 ---
 
-## This skill's core innovations (anchor for self-naming)
+## Naming reasoning example (this skill's own naming decision)
 
-This section exists so naming decisions for *this skill itself* are grounded in
-what makes it genuinely different. Read it before naming Phase N for any skill —
-it's the reference point for "what a full-pipeline naming decision looks like."
+This section shows **how to reason through a naming decision for a full-pipeline skill**.
+It documents lazy-skill-drop's own case. Use it as a reasoning template, not as constraints
+that apply to the skill you're currently naming.
 
-**What this skill does that nothing else does:**
-- Scans the real leaderboard weekly — formula is rebuilt from install data, not frozen in January
-- Runs full pipeline: Recon → Position → Name → README + SKILL.md → Audit → Publish → Evolve
+**lazy-skill-drop's differentiation:**
+- Scans the real leaderboard weekly — formula rebuilt from install data, not frozen in January
+- Full pipeline: Recon → Position → Name → README + SKILL.md → Audit → Publish → Evolve
 - Self-audits its own output on the same rules it applies to others
-- Zero-form UX — extracts everything from conversation, never asks what you already said
-- Velocity moat — weekly self-update means static competitors always lag
+- Zero-form UX — extracts from conversation, never asks what user already said
 
-**What a name for this skill should NOT do:**
-- Name one step (readme-forge names B1 only, scan-forge names R only)
-- Sound like a generator or template tool (misrepresents the pipeline scope)
-- Require insider knowledge to understand (recon-log means nothing to a first-time user)
+**Why this narrows the name choices:**
+- Naming one step (readme-forge, scan-forge) undersells the pipeline scope
+- Needs to signal "idea → published" completeness, not a single tool action
+- Should work as a verb in a sentence: "skilldrop this", "dispatch my skill"
 
-**What a name for this skill SHOULD do:**
-- Signal "idea → published" completeness
-- Feel like a verb when used in a sentence ("skilldrop this", "dispatch my skill")
-- Be pronounceable on first read without pause
+**Apply the same reasoning to the skill you're naming:**
+1. What is its core differentiation (from Phase C positioning sentence)?
+2. Does the name signal the full scope or just one step?
+3. Does it work as a verb or noun in a natural sentence?
 
 ---
 

@@ -6,14 +6,14 @@ role: AI-operational
 
 # Recon Patterns
 
-Run before Phase B (Forge). Produces market verdict, moats assessment, and position draft.
+Run before Phase C (Position). Produces market verdict, moats assessment, and position draft.
 
 ## Search strategy (4 axes)
 
 1. **Exact function** keywords → find same-bucket
 2. **Domain + verb** (apply/pick/generate/scan/build/drop) → find adjacent
 3. **Upper category** broad query → find dead-bucket signal
-4. **Cross-ecosystem** — same intent in Cursor rules, MCP servers, Codex agents, Gemini CLI agents, Custom GPTs, OpenCode skills. Skill-space spans ≥12 agents (see Sources).
+4. **Cross-ecosystem** — same intent in Cursor rules, MCP servers, Codex agents, Gemini CLI agents, Custom GPTs, OpenCode skills. Skill-space spans ≥12 agents.
 
 ## Per-candidate signals (extract 6)
 
@@ -70,7 +70,7 @@ Write the draft into recon-log.md; Phase C will refine and confirm with the user
 ## Category Creation red lines (do NOT recommend if ANY apply)
 
 1. No demonstrable 10x advantage
-2. Runway < 18 months
+2. No committed time to maintain or promote the skill for 6+ months
 3. No media bandwidth (blog cadence / conferences / vocabulary work)
 4. Motivation is solely "avoiding a crowded category" (not genuine differentiation)
 

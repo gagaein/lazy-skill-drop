@@ -92,15 +92,17 @@ If `gh auth status` already passes and `gh api user --jq .login` returns the cor
 
 Read the full current conversation. Extract:
 
-- **problem**: the specific pain this skill solves (1 sentence)
-- **miss**: what existing tools miss (1 sentence, concrete)
-- **result**: the concrete outcome after using this skill (1 sentence)
-- **install_cmd**: any `git clone` / `cp` / `npx` command mentioned
+- **problem**: the specific pain this skill solves (1 sentence) → feeds Phase C + README hook
+- **mechanism**: what the skill does internally (1 sentence) → feeds Phase B2 workflow section
+- **result**: the concrete outcome after using this skill (1 sentence) → feeds README bullets
+- **miss**: what existing tools miss (1 sentence, concrete) → feeds Phase C as user's own framing
+- **install_cmd**: any `git clone` / `cp` / `npx` command mentioned → feeds README line 2
 
 Rules:
 - Extract from the conversation — do not ask the user to repeat what they already said
-- If one item is genuinely missing and can't be inferred, ask ONE question to fill it
-- Never ask all four as a form or checklist
+- If a required field is genuinely missing and can't be inferred, ask ONE question to fill it
+- Never ask all five as a form or checklist
+- `miss` is optional if Phase R will surface it — only extract if user explicitly stated it
 - If the user said "ship it" with no prior context, ask: "Which skill should I publish, and what does it do?"
 
 ---
@@ -111,7 +113,7 @@ Read `references/recon-patterns.md`. Run 4-axis search, classify each candidate 
 
 Write `{verdict, top-3 adjacent, moats y/n/partial, position draft}` to `memory/recon-log.md`. propose.py reads this to detect category-level drift across weeks.
 
-If verdict is `HEAD_ON_COLLISION` and Moats checklist has ≤1 Yes, surface this to the user at Phase D. Do not auto-block — user may have a valid 10x thesis.
+If verdict is `HEAD_ON_COLLISION` and Moats checklist has ≤1 Yes, surface this to the user **before asking "Positioning locked?"** in Phase C. Do not auto-block — user may have a valid 10x thesis.
 
 ---
 
@@ -189,25 +191,33 @@ Read `references/viral-patterns.md` + `references/readme-rules.md` (B1) and `ref
 
 Build per current week's viral formula. Positioning sentence placement: if it's ≤16 words and verb-first, use it as the hook. Otherwise place it as the first prose line after the 4-bullet summary. Never bury it below H2 headings.
 
+**Field → README mapping (from Phase A extractions):**
+- `problem` → hook line or opening sentence
+- `result` → 4-bullet summary (concrete outcomes, with numbers)
+- `install_cmd` → line 2-3, before hook
+- `miss` → position statement (if not superseded by Phase C sentence)
+
 ### B2 — Forge SKILL.md
 
 SKILL.md has six required sections (read `skill-md-rules.md` for rules):
 
-1. **Frontmatter** — name (from Phase N), description (from Phase C pain + trigger phrases), version
+1. **Frontmatter** — name (from Phase N), description (see below), version
 2. **Overview** — 1-3 sentences, what it does and when (functional, no marketing)
 3. **Trigger signals** — exact phrases / contexts that should activate this skill
 4. **Phase / workflow instructions** — the step-by-step the agent follows
 5. **Rule precedence** — which reference file wins when rules conflict
 6. **Reference file table** — what to read and when
 
-Feed from previous phases:
-- Description field trigger ← Phase C positioning pain (the user symptom that Phase C addresses)
-- Phase / workflow ← mechanism field from Phase A
+**Feed from previous phases:**
+- Description field = "Use when [Phase C positioning pain]" — write it in the user's own phrasing from `problem` if available; trigger on the symptom, never summarize the workflow
+- Phase / workflow ← `mechanism` from Phase A
 - Name ← Phase N output
 
 ---
 
 ## Phase P — Polish (anti-AI two-pass)
+
+**Applies to README.md only.** SKILL.md is governed by `skill-md-rules.md` and is not run through these filters.
 
 Read `references/anti-ai-patterns.md` for the current forbidden word list.
 
@@ -248,7 +258,7 @@ Show the user, in order:
 
 Then ask exactly: **"Content looks good? (y / tell me what to change)"**
 
-- If user says `y` / `yes` / `go` / `ok` → proceed to Phase E (fully automatic)
+- If user says `y` / `yes` / `go` → proceed to Phase E (fully automatic)
 - If user says "change X" → apply the change, re-show Stage 1 from the top
 - Never skip Stage 1. Silence is not consent.
 
@@ -320,6 +330,8 @@ These rules protect the one remaining gate: the user must see and approve the co
 
 ## Rule precedence (when conflicts arise)
 
+**First rule, above all others: user-supplied wording (hook, name, description, any explicit phrasing) overrides every rule below. Never rewrite what the user already wrote.**
+
 | # | Rule source | Weight | Notes |
 |---|---|---|---|
 | 1 | `viral-patterns.md` (structure: hook, install, length, bullets) | Highest | Format rules first |
@@ -330,7 +342,10 @@ These rules protect the one remaining gate: the user must see and approve the co
 | 6 | `anti-ai-patterns.md` Tier 1 (hard red flags) | Medium | Filter after structure |
 | 7 | `anti-ai-patterns.md` Tier 2/3 (soft signals) | Low | Never block for these |
 
-User-supplied wording (hook, name, description) overrides all of the above.
+**Common conflicts and resolution:**
+- Positioning sentence (Phase C) is longer than viral hook target → keep the sentence, place it after the hook
+- `miss` from Phase A differs from Phase C position sentence → Phase C wins; `miss` is raw input, Phase C refines it
+- Anti-AI pattern conflicts with viral formula structure → viral formula wins (always)
 
 ---
 
@@ -349,7 +364,7 @@ Rules derived from Anthropic skill-creator SKILL.md and obra/superpowers.
 
 Both are anchored to the Phase C positioning sentence.
 
-- Phase B1 → Forge README.md. Read `viral-patterns.md` + `readme-rules.md`. Positioning sentence goes in first prose line after 4-bullet summary.
+- Phase B1 → Forge README.md. Read `viral-patterns.md` + `readme-rules.md`. Positioning sentence: use as hook if ≤16 words and verb-first, otherwise first prose line after 4-bullet summary.
 - Phase B2 → Forge SKILL.md. Read `skill-md-rules.md`. Description triggers on the pain the positioning names.
 
 ---

@@ -3,7 +3,6 @@ max_lines: 80
 version: w2026-17
 role: AI-operational
 applies_to: README.md ONLY — not SKILL.md
-note: synthesized from two independent studies — see Sources
 ---
 
 # Viral Patterns (current formula)
@@ -21,10 +20,10 @@ Capability layer (install_line_target, readme_length_target, etc.) lives in
 ### Structural targets
 
 ```
-hook_words:       13    avg  (range 9–16; both studies agree)
-install_line:      2    ALL top skills — title → line 2 install, no exceptions (both studies)
-readme_length:   419    words avg  (sweet spot 350–450; A was 210 because A measured SKILL.md)
-paragraphs:       11    avg  (median 12; skill-creator is outlier at 23)
+hook_words:       13    avg  (range 9–16)
+install_line:      2    ALL top skills — title → line 2 install, no exceptions
+readme_length:   419    words avg  (sweet spot 350–450)
+paragraphs:       11    avg  (median 12)
 bullet_count:     30    avg  (range 12–71; strongly type-dependent — see below)
 heading_depth:   2.8    avg  (H2–H4; H3 is mode; H4 signals complexity)
 ```
@@ -54,7 +53,7 @@ Position statement template (pick one):
 "X handles A. This handles B — the part X leaves to you."
 ```
 
-### Hook patterns (both studies consistent)
+### Hook patterns
 
 ```
 command verb first  7/11  "Create ...", "Audit ...", "Turn ...", "Take ..."

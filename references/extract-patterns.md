@@ -8,31 +8,35 @@ role: AI-operational
 
 Phase A pulls these from the conversation. Do not ask all at once.
 
-## 4 required fields (Phase A extracts these)
+## Required fields (Phase A extracts these)
 
-| Field | Content | Length | Destination |
+| Field | Content | Length | Feeds |
 |---|---|---|---|
-| `problem` | Symptom the user experiences | 1-2 sentences | README.md |
-| `mechanism` | What the skill does internally | 1-2 sentences | README.md |
-| `install_cmd` | Literal command user runs | 1 line | README.md |
-| `trigger_description` | "Use when..." phrase | <120 words | SKILL.md frontmatter |
+| `problem` | Symptom the user experiences | 1-2 sentences | README hook, Phase C input |
+| `mechanism` | What the skill does internally | 1-2 sentences | Phase B2 workflow section |
+| `result` | Concrete outcome after using the skill | 1-2 sentences | README bullet summary |
+| `install_cmd` | Literal command user runs | 1 line | README line 2 |
 
-**Note:** `position_statement` is NOT a Phase A field — it is generated in Phase C from Recon output. Do not try to extract it from conversation.
+**Not extracted in Phase A:**
+- `position_statement` — generated in Phase C from Recon output, not extracted from conversation
+- `trigger_description` — derived from `problem`; Phase B2 writes it as "Use when [problem phrasing]"
+
+**`miss` field:** extract if user explicitly states what competitors miss. If not stated, Phase R surfaces this through competitive analysis. Do not ask for it.
 
 ## Optional fields (add when conversation supplies)
 
-| Field | Destination |
+| Field | Feeds |
 |---|---|
-| `concrete_example`: before/after or command demo | README.md |
-| `non_goals`: things the skill explicitly doesn't do | README.md |
-| `platform_compat`: Claude Code / Cursor / Codex / Gemini CLI | README.md |
-| `dependencies`: runtime requirements | README.md |
+| `miss`: what existing tools miss | Phase C as additional input |
+| `concrete_example`: before/after or command demo | README example section |
+| `non_goals`: things the skill explicitly doesn't do | README |
+| `platform_compat`: Claude Code / Cursor / Codex / Gemini CLI | README |
+| `dependencies`: runtime requirements | README |
 
 ## Missing-field rule
 
 If a required field is missing: ask ONE question, not a form.
 Priority: problem → mechanism → install_cmd.
-Never ask about trigger_description — derive from problem.
 
 ## Quote user wording
 
