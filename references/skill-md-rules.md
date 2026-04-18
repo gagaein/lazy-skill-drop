@@ -25,7 +25,7 @@ Rules for generating any SKILL.md. Reader is Claude, not humans.
 
 - Total ≤ 200 lines.
 - Body after frontmatter ≤ 150 lines.
-- Section > 30 lines → extract to a reference file.
+- Section > 50 lines → consider extracting to a reference file (guideline, not hard rule).
 - Never duplicate content between SKILL.md and references.
 
 ## Description field

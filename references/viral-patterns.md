@@ -1,126 +1,115 @@
 ---
-max_lines: 70
+max_lines: 80
 version: w2026-17
 role: AI-operational
 applies_to: README.md ONLY — not SKILL.md
-note: real data — sampled from skills.sh top 20 + obra/superpowers + anthropics/skills
+note: synthesized from two independent studies — see Sources
 ---
 
 # Viral Patterns (current formula)
 
-**Scope:** this file governs README.md generation only. SKILL.md follows
-`skill-md-rules.md`, which has fundamentally different constraints.
+**Scope:** governs README.md generation only. SKILL.md follows `skill-md-rules.md`.
 
-This file is the **knowledge layer** — auto-updated weekly by `scripts/scan.py`.
-Do not edit by hand; changes will be overwritten by the next scan.
-
+Auto-updated weekly by `scripts/scan.py`. Do not edit by hand.
 Capability layer (install_line_target, readme_length_target, etc.) lives in
-`SKILL.md` frontmatter and only changes via PRs from `scripts/propose.py`.
+`SKILL.md` frontmatter and only changes via `scripts/propose.py` PRs.
 
 ---
 
 ## Current formula — w2026-17
 
-**Scanned:** 2026-04-17
-**Sample:** 11 skills, 3,303K total installs (skills.sh top 20 + obra/superpowers + anthropics)
-**Method:** manual README extraction from skills.sh pages + GitHub; 7-field quantification
+**Studies:**
+- A: n=11, measured SKILL.md content on skills.sh (agent instruction file, shorter)
+- B: n=6, measured GitHub README.md files (human-facing, the correct reference for README gen)
+- Where studies conflict, B wins — lazy-skill-drop generates README.md files, not SKILL.md
 
-### Structural averages (install-weighted)
-
-```
-hook_words:      12.1   (range 4–15)
-install_line:     2.0   (ALL skills put install on line 2, right after H1)
-readme_length:  209     words (excl. code blocks, range 104–261)
-paragraph_count:  5.2   prose paragraphs
-bullet_count:    11.5   bullet/list items
-heading_depth:    2.2   max H-level (H2 always, H3 common, H4 rare)
-```
-
-### Hook opening structure (frequency across sample)
+### Structural targets (study B)
 
 ```
-command verb first   7/11   "Create ...", "Audit ...", "Take ..."
-noun phrase first    3/11   "Domain-specific ...", "Comprehensive ...", "An agentic ..."
-question             0/11
+hook_words:       13    avg  (range 9–16; both studies agree)
+install_line:      2    ALL top skills — title → line 2 install, no exceptions (both studies)
+readme_length:   419    words avg  (sweet spot 350–450; A was 210 because A measured SKILL.md)
+paragraphs:       11    avg  (median 12; skill-creator is outlier at 23)
+bullet_count:     30    avg  (range 12–71; strongly type-dependent — see below)
+heading_depth:   2.8    avg  (H2–H4; H3 is mode; H4 signals complexity)
 ```
 
-**Critical finding:** install_line seed was 8.1 — real data is 2.0.
-Every top skill puts install command immediately after the H1 title.
-The "hook → problem → install" narrative structure is NOT what top skills use.
+### Skill type × bullet count (do not apply a single threshold)
 
-### Actual top-skill structure (H1 → line 2 install → 4 bullets → H2 body)
+| Type | Bullets | Examples |
+|---|---|---|
+| Instructional / opinionated | 10–25 | frontend-design (13), superpowers (18) |
+| Rules directory / reference | 30–70 | vercel-react (71 rules), ui-ux-pro-max (40+) |
+| Tool / API integration | 15–30 | soultrace (22), web-design-guidelines (18) |
 
-```
-# skill-name
-$ npx skills add owner/repo --skill skill-name
+**Rule:** match bullet count to type. A 10-bullet directory skill and a 70-bullet directory
+skill can both have 300K+ installs. The absolute number is not the signal — type match is.
 
-One-sentence capability statement.
-
-- Specific claim with numbers (e.g. "64 rules across 8 categories")
-- Second specific claim with scope
-- Third specific claim with example output
-- Fourth specific claim
-
-## When to Apply / How It Works
-...
-```
-
-### Concrete example rate
+### Near-mandatory signals (study B)
 
 ```
-has_code_example:    7/11 = 64%   (curl, JS blocks, before/after snippets)
-has_position_stmt:   1/11 =  9%   ← was assumed important; actually rare
+has_position_statement:   83%  (5/6 top READMEs name what adjacent tools miss)
+has_concrete_example:     83%  (5/6 include code block, curl, or before/after)
 ```
 
-**Critical finding:** position_statement ("unlike X, this does Y") appears in
-only 1 of 11 top skills. Replace with: **specific numbers in bullets**.
-Top-performing hooks use counts: "50+ styles", "64 rules", "30+ rule files".
-
-### Forbidden words seen in current low-performer sample
-
+Position statement template (pick one):
 ```
-forbidden_seen:
-    "seamless"      in 4/10
-    "leverage"      in 3/10
-    "comprehensive" in 3/10  ← NOTE: ui-ux-pro-max uses it successfully
-    "robust"        in 2/10
+"{Top-adjacent-1} and {top-adjacent-2} do X but assume Y. This does Y directly."
+"Unlike X, this does Y without requiring Z."
+"X handles A. This handles B — the part X leaves to you."
 ```
 
-**Exception rule:** "comprehensive" survives when immediately followed by a
-count ("Comprehensive design guide with 50+ styles, 161 color palettes").
-The number redeems the vague adjective. Without a number → still forbidden.
+### Hook patterns (both studies consistent)
 
-### Distinguishing signals (what high-install skills do that low-install ones don't)
+```
+command verb first  7/11  "Create ...", "Audit ...", "Turn ...", "Take ..."
+noun phrase         3/11  "Domain-specific ...", "Comprehensive ...", "React and Next.js ..."
+question            0/11  not observed in top skills
+```
 
-- Install command on line 2 — not buried after paragraphs
-- 4-bullet summary with concrete numbers (not vague promises)
-- Verb-first hook sentence OR noun phrase with specific domain + scale
-- Code example OR API call example (64% rate)
-- H2 section "When to Apply" or "When to Use" as first body heading
-- "Must Use" / "Skip" decision matrix (appears in ui-ux-pro-max, skill-creator)
+Top opening verbs (frequency): Create, Turn, Audit, Discover, Build, Take, Run
+
+### Structure that works (from all samples)
+
+```
+line 1:  # skill-name
+line 2:  $ npx skills add ... OR `git clone ...`  ← install FIRST, always
+line 4:  One-sentence capability statement (9–16 words, verb-first preferred)
+         OR inline-code install followed by hook sentence 2 lines later
+
+line 6+: 4-bullet summary with SPECIFIC NUMBERS:
+         "50+ styles", "64 rules across 8 categories", "30+ rule files"
+         (not: "comprehensive guide" without numbers)
+
+H2 body: When to Apply / How It Works / Quick Reference
+H3 body: subsections within each H2
+```
 
 ### What does NOT correlate with installs
 
-- Position statement vs competitors (only caveman, 45K installs, does this)
-- Short README length (skill-creator 246w, find-skills 242w both 150K+)
-- Prose over bullets — top skills use 10–15 bullets, NOT prose paragraphs
+- Position statement has QUANTITATIVE data (`83%`) but was previously thought rare (9% was wrong — that study measured SKILL.md, not README.md)
+- Prose over bullets: FALSE — top skills average 30 bullets, not prose
+- Exact word count: sweet spot 350–450 but type variance is large; directional target only
+
+### Forbidden words seen in low-performer README samples
+
+```
+forbidden_seen:
+    "seamless"       in 4/10
+    "leverage"       in 3/10
+    "comprehensive"  in 3/10  — OK *only* when followed by count ("comprehensive guide with 50+ X")
+    "robust"         in 2/10
+    "innovative"     in 2/10
+```
 
 ---
 
 ### Sources
 
-| Skill | Installs | Type |
-|---|---|---|
-| find-skills (vercel-labs) | 1,100K | monorepo |
-| vercel-react-best-practices | 322K | monorepo |
-| frontend-design (anthropics) | 302K | monorepo |
-| obra/superpowers | ~600K | standalone |
-| web-design-guidelines | 257K | monorepo |
-| remotion-best-practices | 244K | monorepo |
-| skill-creator (anthropics) | 152K | monorepo |
-| soultrace-ai | 132K | standalone |
-| ui-ux-pro-max | 119K | standalone |
-| caveman | 45K | standalone |
-| obsidian-skills | 30K | standalone |
+| Study | n | What was measured | Installs range |
+|---|---|---|---|
+| A (P0.5c, mine) | 11 | SKILL.md content on skills.sh pages | 1.1M–30K |
+| B (P0.5c, yours) | 6 | GitHub README.md files | 1.1M–132K |
+| Regression | 40 | Mixed (high+low performers, scoring proxy) | 1.1M–43 |
 
-_This file is regenerated every Monday by scan.py. Last regen: 2026-04-17._
+_Regenerated by scan.py every Monday. Last manual update: 2026-04-17._

@@ -42,12 +42,16 @@ FORBIDDEN   = SKILL_ROOT / "references" / "anti-ai-patterns.md"
 PASS_THRESHOLD = 0.70
 
 DEFAULT_FORMULA = {
-    "hook_words_target":       12,    # real data: 12.1 install-weighted (was 10)
+    # ── Data sources ─────────────────────────────────────────────────────────
+    # hook_words / install_line: both study A (n=11, SKILL.md) and B (n=6, README.md) agree
+    # readme_length / bullets / position: study B only — B measured actual GitHub README.md
+    # Study A measured SKILL.md content (shorter, agent-facing); B is correct for README target
+    "hook_words_target":       13,    # B: mean=13 range 9-16; A: 12.1 — take midpoint 13
     "hook_words_tolerance":    4,
-    "install_line_target":     2,     # real data: ALL top skills put install on line 2 (was 8!)
+    "install_line_target":     2,     # both: ALL top skills install on line 2-3
     "install_line_tolerance":  2,
-    "readme_length_target":    210,   # real data: 209 install-weighted (was 247)
-    "readme_length_tolerance": 60,
+    "readme_length_target":    400,   # B: mean=419, sweet spot 350-450 (A was wrong: 210 was SKILL.md)
+    "readme_length_tolerance": 100,   # range 312-668, wider tolerance required
     "description_max":         120,
 }
 
@@ -72,25 +76,21 @@ WORKFLOW_SUMMARY_VERBS = {
 
 DIM_WEIGHTS = {
     # ── Regression-calibrated weights (w2026-17, n=40, R²=0.69, LogReg acc=92.5%) ──
-    #
-    # Key changes vs seed weights:
-    #   install_position  0.15 → 0.30  ← strongest binary predictor (LogReg 0.467)
-    #   word_count        0.15 → 0.20  ← highest OLS coefficient (2.87), sweet-spot matters
-    #   hook_quality      0.25 → 0.15  ← still top-3 but was overweighted
-    #   banned_headers    0.05 → 0.00  ← near-zero signal in both models (LogReg 0.001);
-    #                                     still scored and shown in output, not counted
-    #   token_budget kept at 0.05 as operational guard (not in regression sample)
+    # Updated with study B data (n=6 GitHub README.md, 1.1M–132K installs):
+    #   position_statement added: 83% presence rate in high-install READMEs
+    #   burstiness removed: LogReg 0.036, no longer run
+    #   banned_headers informational only: LogReg 0.001
     # Sum = 1.00
-    "install_position":     0.30,   # target: README.md — #1 binary predictor
-    "word_count":           0.20,   # target: README.md — #1 OLS predictor (sweet spot ~210w)
-    "hook_quality":         0.15,   # target: README.md — important but was over-indexed
-    "description_triggers": 0.15,   # target: SKILL.md frontmatter — unchanged
-    "forbidden_words":      0.10,   # target: README + SKILL.md — unchanged (negative OLS coeff)
-    "description_length":   0.05,   # target: SKILL.md frontmatter — weak but non-zero
-    "token_budget":         0.05,   # target: SKILL.md + refs — operational guard, not in regression
-    "burstiness":           0.00,   # informational only — LogReg 0.036, below threshold
-    "banned_headers":       0.00,   # informational only — LogReg 0.001, no predictive value
-    # Sum = 1.00
+    "install_position":     0.30,   # #1 binary predictor (LogReg 0.467); line 2–3, 100% of top skills
+    "word_count":           0.20,   # #1 OLS predictor; sweet spot 350–450 words (study B)
+    "hook_quality":         0.15,   # top-3; verb-first, 9–16 words
+    "description_triggers": 0.15,   # SKILL.md frontmatter: no workflow-summary verbs
+    "forbidden_words":      0.10,   # negative OLS coeff; Tier-1 AI slop words
+    "position_statement":   0.05,   # NEW: 83% presence in high-install READMEs (study B)
+    "description_length":   0.05,   # SKILL.md description ≤120 words
+    "token_budget":         0.00,   # operational guard only — shown but not scored
+    "banned_headers":       0.00,   # informational only — LogReg 0.001
+    # burstiness removed — LogReg 0.036, not called
 }
 # Scorer signature encodes target file:
 #   score_X(readme_text, ...)      → looks at README only
@@ -105,13 +105,13 @@ DIM_WEIGHTS = {
 DIM_DIAGNOSTICS = {
     "hook_quality":
         "The first line of the README isn't doing its job — {note}. "
-        "Current formula wants a short imperative hook (about 10 words, starting with a verb).",
+        "Current formula: 9–16 words, imperative verb first (Turn / Ship / Build / Take).",
     "install_position":
         "The install command is in the wrong place — {note}. "
-        "Readers expect it within the first ~8 lines, right after the hook.",
+        "100% of top skills put it on line 2–3, right after the H1 title. No exceptions.",
     "word_count":
         "README length is off formula — {note}. "
-        "Shorter than target reads thin; longer than target reads like AI filler.",
+        "Sweet spot is 350–450 words; below that reads thin, above reads like AI padding.",
     "forbidden_words":
         "AI-slop words detected in the docs: {note}. "
         "These trigger 'obviously AI-generated' pattern matchers on sight.",
@@ -122,19 +122,20 @@ DIM_DIAGNOSTICS = {
         "The SKILL.md description contains workflow-summary verbs ({note}). "
         "This is the exact anti-pattern lazy-skill-drop audits in others — obra's research "
         "shows Claude follows the description summary and skips the skill body when this happens.",
+    "position_statement":
+        "No competitive positioning found — {note}. "
+        "83% of high-install READMEs name what adjacent tools miss. "
+        "One sentence: 'X and Y do A but assume B; this does B directly.'",
     "banned_headers":
         "README uses generic AI-slop headers: {note}. "
         "'Overview', 'Features', 'Introduction' are the top three tells.",
-    "burstiness":
-        "Paragraph rhythm is too uniform — {note}. "
-        "Real human writing varies sentence/paragraph length. "
-        "AI text optimizes for consistency, which detectors flag.",
     "token_budget":
         "Default context is too large — {note}. "
         "SKILL.md + default-read references should stay ≤7000 tokens "
         "so metadata matching and activation stay reliable. "
         "Compress short-version references or move content to -full.md.",
 }
+# burstiness diagnostic removed — scorer no longer runs
 
 
 # ── formula loading ───────────────────────────────────────────────────────────
@@ -327,7 +328,36 @@ def score_banned_headers(readme_text: str) -> tuple[float, str]:
     return score, f"banned: {', '.join(hits)}"
 
 
+def score_position_statement(readme_text: str) -> tuple[float, str]:
+    """83% of high-install README.md files contain a competitive positioning line.
+    Patterns: 'unlike X', 'while X does A, this does B', 'X and Y miss Z', 'not X—this does Y'.
+    Score 1.0 if found, 0.0 if absent (binary — you either have it or you don't).
+    """
+    patterns = [
+        r"\bunlike\b",
+        r"\bwhile\b.{5,50}\b(this|it)\b",
+        r"\binstead of\b",
+        r"\bother tools\b",
+        r"\bmost\b.{5,60}\b(but|this|lazydrop|it)\b",   # "Most X do Y, but this..."
+        r"\bwhat.{1,20}miss\b",
+        r"(?:stop|skip|no more)\b.{5,40}\b(?:start|use|this)\b",
+        r"\bdifferent\b.{0,20}\b(because|since|while)\b",
+        r"not\b.{5,40}—\s*\w",  # "Not X — this does Y" with em-dash
+    ]
+    low = readme_text.lower()
+    for p in patterns:
+        import re as _re
+        if _re.search(p, low):
+            return 1.0, "position statement found"
+    return 0.0, "no position statement — 83% of top skills have one"
+
+
+# ── Deprecated scorers (weight=0.00, kept for optional diagnostic use) ────────
+
 def score_burstiness(readme_text: str) -> tuple[float, str]:
+    """DEPRECATED: LogReg signal 0.036, below threshold. Not called in audit().
+    Paragraph rhythm CV — interesting theory, doesn't predict installs."""
+
     paragraphs = []
     for p in readme_text.split("\n\n"):
         s = p.strip()
@@ -394,15 +424,17 @@ def audit(readme_path: Path = README_PATH, skill_md_path: Path = SKILL_MD) -> di
     combined = readme + "\n" + skill_md
 
     scorers = {
-        "hook_quality":         lambda: score_hook(readme, formula),
-        "install_position":     lambda: score_install_position(readme, formula),
-        "word_count":           lambda: score_word_count(readme, formula),
-        "forbidden_words":      lambda: score_forbidden(combined, forbidden),
-        "description_length":   lambda: score_description_length(skill_md, formula),
-        "description_triggers": lambda: score_description_triggers(skill_md),
-        "banned_headers":       lambda: score_banned_headers(readme),
-        "burstiness":           lambda: score_burstiness(readme),
-        "token_budget":         lambda: score_token_budget(skill_md_path),
+        # ── Scored dimensions (contribute to total) ──────────────────────────
+        "install_position":      lambda: score_install_position(readme, formula),
+        "word_count":            lambda: score_word_count(readme, formula),
+        "hook_quality":          lambda: score_hook(readme, formula),
+        "description_triggers":  lambda: score_description_triggers(skill_md),
+        "forbidden_words":       lambda: score_forbidden(combined, forbidden),
+        "position_statement":    lambda: score_position_statement(readme),
+        "description_length":    lambda: score_description_length(skill_md, formula),
+        "token_budget":          lambda: score_token_budget(skill_md_path),
+        # ── Informational only (weight=0.00, shown but not counted) ──────────
+        "banned_headers":        lambda: score_banned_headers(readme),   # LogReg 0.001
     }
 
     dims = {name: fn() for name, fn in scorers.items()}
