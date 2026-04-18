@@ -1,88 +1,108 @@
 ---
-max_lines: 80
+max_lines: 90
 version: w2026-17
 role: AI-operational
 ---
 
 # Naming Patterns
 
-## Length distribution (target)
+Claude skill names live in two contexts simultaneously — optimizing only one produces bad names.
 
-- 1-word: 30% (`brainstorming`, `sanitize`, `remotion`)
-- 2-word: 50% ← **preferred**
-- 3-word: 15%
-- 4+: 5% (only when disambiguation required)
+**Context 1 — Discovery** (skills.sh slug, GitHub URL, awesome-list):
+Scanned quickly. Must signal category and scope fast. Short wins.
 
-## Character style
+**Context 2 — Activation** (user says it in conversation, description field triggers):
+Must feel natural to say aloud and appear in the phrases users actually reach for.
+Names that are awkward to speak ("readme-forge" requires a pause) fail here.
 
-kebab-case only. ASCII only. ≤30 chars. No numbers unless version literal.
+---
 
-## Six semantic structures (by frequency)
+## Scope honesty rule
 
-| Structure | Share | Example | Pick when |
-|---|---|---|---|
-| verb-noun | 35% | find-skills, code-review | Function is the selling point |
-| single-metaphor | 20% | brainstorming, sanitize | Concept needs memorable anchor |
-| domain-noun | 20% | frontend-design, aws-skills | SEO-driven audience |
-| portmanteau | 10% | plannotator, crowdcast | Unique brand handle needed |
-| domain-skill suffix | 10% | aws-skills, taste-skill | Collection repo, NOT single skill |
-| ironic | 5% | lazy-skill-drop, superpowers | Product 10x better than name suggests |
+**Name the outcome, not the mechanism.**
 
-## Forbidden words (Tier 1 — zero in top 20)
+For a multi-phase pipeline (research → generate → audit → ship → evolve):
+- Bad: `readme-forge` — names one middle step
+- Bad: `skill-publisher` — names the last step only
+- Good: names that capture "from idea to live, automatically"
 
-viral, ultimate, amazing, super-*, revolutionary, innovative, next-gen,
-cutting-edge, magic, wizard, genius, smart, intelligent, ai-powered,
-gpt-powered, my-*, simple-*, easy-*
+If the product is a pipeline, the name should feel like a pipeline noun, not a tool noun.
+Verb-noun works for single-function utilities; metaphor or portmanteau works better for
+full pipelines because a single verb undersells scope.
 
-## Weak-signal suffixes (drop unless required)
+---
 
--skill, -skills, -tool, -tools, -cli (only keep if literally applies)
+## Six semantic structures
 
-## Verb sets (different from hook verbs)
+| Structure | Share | Best when |
+|---|---|---|
+| verb-noun | 35% | Single function is the draw (find-skills, code-review) |
+| single-metaphor | 20% | Product is hard to describe but easy to feel (superpowers) |
+| domain-noun | 20% | SEO matters; audience is domain-defined (frontend-design) |
+| portmanteau | 10% | Need a unique brand handle (skilldrop) |
+| domain-skill suffix | 10% | Collection repos only, NOT single skills (aws-skills) |
+| ironic | 5% | Product 10x better than name implies (lazy-skill-drop) |
 
-Name verbs (functional): find, write, execute, fix, review, build, enhance,
-design, debug, sanitize, attach, read, install, audit, scan, ship, publish,
-forge, pick, extract
+---
 
-Do NOT use hook verbs (Stop, Turn, Skip, Drop) in names.
+## Forbidden
 
-## Memorability check (all 3 should pass)
+- Hook verbs as first word: stop, skip, drop, turn, ship (reserved for README hooks, not names)
+- Tier 1 AI slop: viral, ultimate, amazing, revolutionary, smart, ai-powered
+- Weak suffixes unless literally accurate: -skill, -skills, -tool, -tools, -cli
+- Version numbers or years
 
-1. 2-3 syllables
-2. Contains one distinctive sound (unusual consonant cluster or vowel)
-3. Hooks to a known concept (metaphor, anchor)
+These are mechanical filters. A name passing all of them can still be wrong.
 
-## Collision check (must all 3 pass before commit)
+---
 
-1. GitHub search top 3 is not same-category competitor
-2. npm package name available
-3. Google first page not dominated by trademark conflict
+## Memorability (3 questions, all "yes" required)
 
-## Pre-publish checklist (10 items, 9+ must pass)
+1. Say it aloud without hesitation?
+2. Spell it from hearing once?
+3. Hooks to a single clear concept — metaphor, action, place?
 
-- [ ] 1-3 words
-- [ ] kebab-case, ASCII only, ≤30 chars
-- [ ] No Tier 1 forbidden words
-- [ ] No weak-signal suffix unless applies
-- [ ] No version numbers
-- [ ] GitHub top 3 clear of same-category
-- [ ] npm available (if relevant)
-- [ ] Pronounceable on first read
-- [ ] At least one memorability anchor
-- [ ] Description can be short because name carries meaning
+---
 
-If 9+ pass, ship. If 7-8, reconsider. If ≤6, regenerate.
+## Activation test (Claude-specific)
+
+Would a user naturally say this in a sentence when they want the skill?
+- "lazydrop my skill" — works as verb, memorable ✓
+- "use scan-forge on this" — awkward, sounds like a command ✗
+
+For skills invoked by intent rather than name: test the description trigger instead.
+
+---
+
+## Scope calibration
+
+| Product scope | Name guidance |
+|---|---|
+| Single-function utility | verb-noun; name the function directly |
+| Multi-step workflow | metaphor or portmanteau; name the outcome |
+| Full pipeline | metaphor wins; the name is a brand, not a description |
+| Official / org-backed | 1-word or tight kebab |
+| Experimental / personal | ironic or metaphor OK; don't LARP authority |
+
+---
+
+## Pre-ship checklist (gut-check, not binary filter)
+
+A name scoring 7/10 feeling right > 10/10 feeling wrong.
+
+- [ ] Both contexts work (discovery + activation)
+- [ ] Scope honest — name doesn't imply narrower function than product delivers
+- [ ] 1-3 words, pronounceable, spellable from hearing
+- [ ] No Tier 1 forbidden words or weak-signal suffix
+- [ ] No hook verbs
+- [ ] GitHub top 3 in category not same-bucket competitor with this name
+- [ ] Memorable anchor: metaphor, concept, or distinctive sound
+- [ ] Natural in a sentence (activation test passes)
+
+---
 
 ## Project-stage match
 
-- Anthropic / big-brand official → 1-word or short kebab
-- Community established (>500⭐) → verb-noun
-- Experimental / personal / v0.x → metaphor or ironic
-
-Matching stage to style prevents LARPing authority.
-
-## Precedence
-
-When length target conflicts with memorability (e.g., best name is 4 words),
-pick memorability. When ironic conflicts with product stage (v0.1 using
-ironic name), pick stage match.
+- Anthropic / major org: 1-word or tight kebab, no irony
+- Community-established (>500⭐): verb-noun, credibility signal  
+- Experimental / personal: metaphor or ironic fine; matches actual authority level
