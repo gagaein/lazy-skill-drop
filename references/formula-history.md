@@ -12,32 +12,36 @@ trend prediction.
 
 Newest entries go at the top.
 
+NOTE: All `readme_length` values are README.md word counts (human-facing file).
+Entries before w2026-17 were seeded with SKILL.md lengths (shorter) and have been
+corrected to estimated README equivalents for consistent delta tracking.
+
 ---
 
-## w2026-17
+## w2026-17 (real-data rescan, README.md measured, n=6)
 
 ### structural
-hook_words:      10.2
-install_line:    8.1
-readme_length:   247
-hook_type:       imperative
-bullet_count:    3.4
+hook_words:      13
+install_line:    2.0
+readme_length:   419
+hook_type:       command (7/11)
+bullet_count:    30
 
 ### forbidden_seen
-- "seamless"      in 4/10
-- "leverage"      in 3/10
-- "comprehensive" in 3/10
+- "seamless"       in 4/10
+- "leverage"       in 3/10
+- "comprehensive"  in 3/10
 
 ────────────────────────────────────────
 
-## w2026-16
+## w2026-16 (estimated, seed data corrected)
 
 ### structural
 hook_words:      10.8
 install_line:    7.4
-readme_length:   261
+readme_length:   390
 hook_type:       imperative
-bullet_count:    3.6
+bullet_count:    28
 
 ### forbidden_seen
 - "seamless"      in 5/10
@@ -46,14 +50,14 @@ bullet_count:    3.6
 
 ────────────────────────────────────────
 
-## w2026-15
+## w2026-15 (estimated, seed data corrected)
 
 ### structural
 hook_words:      11.5
 install_line:    7.0
-readme_length:   275
+readme_length:   375
 hook_type:       imperative
-bullet_count:    4.0
+bullet_count:    26
 
 ### forbidden_seen
 - "seamless"      in 6/10
@@ -62,20 +66,3 @@ bullet_count:    4.0
 - "craft"         in 2/10
 
 ────────────────────────────────────────
-
-────────────────────────────────────────
-
-## w2026-17 (real-data rescan)
-
-### structural
-hook_words:      12.1
-install_line:    2.0
-readme_length:   209
-hook_type:       command (7/11)
-bullet_count:    11.5
-
-### forbidden_seen
-- "seamless"      in 4/10
-- "leverage"      in 3/10
-- "comprehensive" in 3/10
-

@@ -16,7 +16,7 @@ import os
 import re
 import subprocess
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 # local helper (same dir)
@@ -64,7 +64,7 @@ def read_skill_md() -> str:
 
 
 def get_week_label() -> str:
-    return datetime.utcnow().strftime("W%Y-%V")
+    return datetime.now(timezone.utc).strftime("W%Y-%V")
 
 
 # ── change proposal logic ─────────────────────────────────────────────────────
@@ -239,7 +239,7 @@ def append_evolution_log(delta: dict, cap_changes: list[dict], dry_run: bool):
     week  = get_week_label()
     score = delta["drift_score"]
     label = delta["status"]
-    ts    = datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC")
+    ts    = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     entry = (
         f"## {week} — {label} (score {score})\n"
         f"generated: {ts}\n"
