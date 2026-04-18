@@ -8,15 +8,16 @@ role: AI-operational
 
 Phase A pulls these from the conversation. Do not ask all at once.
 
-## 5 required fields
+## 4 required fields (Phase A extracts these)
 
-| Field | Content | Length | Destination file |
+| Field | Content | Length | Destination |
 |---|---|---|---|
 | `problem` | Symptom the user experiences | 1-2 sentences | README.md |
 | `mechanism` | What the skill does internally | 1-2 sentences | README.md |
-| `position_statement` | Differentiation vs top-2 adjacent | 1 sentence (filled by Phase R) | README.md |
 | `install_cmd` | Literal command user runs | 1 line | README.md |
-| `trigger_description` | "Use when..." phrase | <120 words | SKILL.md frontmatter `description` |
+| `trigger_description` | "Use when..." phrase | <120 words | SKILL.md frontmatter |
+
+**Note:** `position_statement` is NOT a Phase A field — it is generated in Phase C from Recon output. Do not try to extract it from conversation.
 
 ## Optional fields (add when conversation supplies)
 
@@ -30,9 +31,8 @@ Phase A pulls these from the conversation. Do not ask all at once.
 ## Missing-field rule
 
 If a required field is missing: ask ONE question, not a form.
-Ask in this priority: problem → mechanism → install_cmd.
+Priority: problem → mechanism → install_cmd.
 Never ask about trigger_description — derive from problem.
-Never ask about position_statement — Phase R fills it.
 
 ## Quote user wording
 

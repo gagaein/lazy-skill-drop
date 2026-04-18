@@ -84,7 +84,7 @@ After user replies "done":
 - If verified, proceed to Phase D Stage 1
 - If not verified, re-show the steps that failed
 
-Do NOT skip this setup on the grounds that "user probably knows". The cost of one unnecessary setup pass is small. The cost of a silent publish to the wrong account is bad.
+If `gh auth status` already passes and `gh api user --jq .login` returns the correct account, skip this setup entirely and proceed to Phase D.
 
 ---
 
@@ -166,7 +166,16 @@ Read `references/naming-patterns.md`. If the extracted skill already has a name 
 
 **The positioning sentence from Phase C is the primary input.** The name should reflect the differentiation, not describe a mechanism.
 
-Generate 3 candidates, one per direction from naming-patterns.md viral section. For each, apply the gut-check questions from naming-patterns.md. Pick one. The chosen name becomes the repo slug in Phase E.
+Generate 3 candidates, one per direction from naming-patterns.md viral section. Show them to the user like this:
+
+```
+Name candidates (can change in the final confirm):
+→ [name-1]  [one-line rationale]  ← recommended
+  [name-2]  [one-line rationale]
+  [name-3]  [one-line rationale]
+```
+
+Pick the recommended one and proceed to Phase B. The user can change the name during Phase D — no separate confirmation needed here.
 
 ---
 
@@ -178,11 +187,23 @@ Read `references/viral-patterns.md` + `references/readme-rules.md` (B1) and `ref
 
 ### B1 — Forge README.md
 
-Build per current week's viral formula. Place positioning sentence as the first prose line after the 4-bullet summary (or as the hook if it fits the word count).
+Build per current week's viral formula. Positioning sentence placement: if it's ≤16 words and verb-first, use it as the hook. Otherwise place it as the first prose line after the 4-bullet summary. Never bury it below H2 headings.
 
 ### B2 — Forge SKILL.md
 
-Write description field to trigger on the same user pain the positioning names. Do not summarize the mechanism — trigger on the symptom.
+SKILL.md has six required sections (read `skill-md-rules.md` for rules):
+
+1. **Frontmatter** — name (from Phase N), description (from Phase C pain + trigger phrases), version
+2. **Overview** — 1-3 sentences, what it does and when (functional, no marketing)
+3. **Trigger signals** — exact phrases / contexts that should activate this skill
+4. **Phase / workflow instructions** — the step-by-step the agent follows
+5. **Rule precedence** — which reference file wins when rules conflict
+6. **Reference file table** — what to read and when
+
+Feed from previous phases:
+- Description field trigger ← Phase C positioning pain (the user symptom that Phase C addresses)
+- Phase / workflow ← mechanism field from Phase A
+- Name ← Phase N output
 
 ---
 
@@ -192,7 +213,6 @@ Read `references/anti-ai-patterns.md` for the current forbidden word list.
 
 **Pass 1 — structural:**
 - Delete section headers named: Overview, Introduction, Features, Getting Started
-- Bullet list >4 items → convert to 2 sentences of prose (unless it's a rules-directory skill)
 - Delete sentences starting with "This skill"
 - Delete "whether you're X or Y" constructions
 
@@ -275,7 +295,7 @@ These rules protect the one remaining gate: the user must see and approve the co
 - **Never call `publish.py` before Stage 1 content confirm has passed.** Stage 1 is "did the user approve the text + target account". It is the only gate.
 - **Always pass `--yes` to `publish.py`.** The whole point of v3 is that publish.py runs end-to-end without human input once Stage 1 passes.
 - **Always show the target account in Stage 1's step 4.** Resolve `gh api user --jq .login` before asking "Content looks good?". Removing Stage 2 means the user's last chance to catch a wrong account is here — don't skip it.
-- **Never treat silence, "ok", "sure", or "looks fine" as Stage 1 consent.** Only literal `y` / `yes` / `go` / `ok` from the user's most recent message counts. If uncertain, ask again.
+- **Never treat silence, "sure", "looks fine", or embedded "ok" as Stage 1 consent.** Only standalone `y` / `yes` / `go` from the user's most recent message counts. If the user says "ok so anyway..." or "ok let's go with that" — that's not consent; ask once more. A bare "ok" on its own is borderline; prefer to treat it as a request to confirm.
 - **Never auto-proceed on a timer.** There is no "if no response in N seconds, continue". Stage 1 waits indefinitely.
 - **Async is fine after Stage 1.** Once the user has approved content, publish.py is safe to run in the background / async — the stdin interaction no longer exists.
 - **Self-audit does not gate publishing.** `audit_self.py` still runs on activation for telemetry:
@@ -300,27 +320,17 @@ These rules protect the one remaining gate: the user must see and approve the co
 
 ## Rule precedence (when conflicts arise)
 
-When rules from different reference files conflict, resolve top-down:
+| # | Rule source | Weight | Notes |
+|---|---|---|---|
+| 1 | `viral-patterns.md` (structure: hook, install, length, bullets) | Highest | Format rules first |
+| 2 | Phase C positioning sentence | High | Content backbone — all copy traces back to this |
+| 3 | `extract-patterns.md` (Phase A fields) | High | User's own words win |
+| 4 | `recon-patterns.md` (verdict → strategy) | High | Market reality |
+| 5 | `naming-patterns.md` | Medium | Applies only in Phase N |
+| 6 | `anti-ai-patterns.md` Tier 1 (hard red flags) | Medium | Filter after structure |
+| 7 | `anti-ai-patterns.md` Tier 2/3 (soft signals) | Low | Never block for these |
 
-| # | Rule source | Weight |
-|---|---|---|
-| 1 | `viral-patterns.md` (structural formula: hook, install, length) | Highest |
-| 2 | `naming-patterns.md` | High |
-| 3 | `extract-patterns.md` (Phase A required fields) | High |
-| 4 | `recon-patterns.md` (verdict → strategy mapping) | High |
-| 5 | Phase C positioning sentence (backbone constraint for Phase B) | High |
-| 6 | `anti-ai-patterns.md` Tier 1 (hard red flags) | Medium |
-| 7 | `anti-ai-patterns.md` Tier 2/3 (soft signals) | Low |
-| 8 | Rhythm / burstiness checks | Lowest |
-
-**In plain terms:** match the current viral formula first. Anti-AI patterns
-are filters to run *after* the structure is right, not constraints that
-block you from writing an on-formula README. A README that hits the viral
-formula with one Tier 2 word is better than a clean-of-AI-words README that
-misses the structural target.
-
-When a user-supplied hook / name / description already exists, their words
-win over all rules above.
+User-supplied wording (hook, name, description) overrides all of the above.
 
 ---
 
@@ -357,7 +367,7 @@ All reference files are AI-operational: rules only, no citations, no methodology
 | `references/naming-patterns.md` | Phase N (Name) — when naming a new skill |
 | `references/recon-patterns.md` | Phase R (Recon) — before Phase C |
 | `references/extract-patterns.md` | Phase A (Extract) — always |
-| `references/formula-history.md` | Phase B when predicting trend |
+| `references/formula-history.md` | evolve cycle only (delta.py reads for trend prediction) |
 | `memory/performance-log.md` | On activation (startup) |
 | `memory/recon-log.md` | Phase C (Position) — read to pull verdict + top adjacent |
 | `memory/evolution-log.md` | Only when debugging evolution |

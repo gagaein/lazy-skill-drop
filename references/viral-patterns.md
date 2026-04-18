@@ -18,12 +18,7 @@ Capability layer (install_line_target, readme_length_target, etc.) lives in
 
 ## Current formula — w2026-17
 
-**Studies:**
-- A: n=11, measured SKILL.md content on skills.sh (agent instruction file, shorter)
-- B: n=6, measured GitHub README.md files (human-facing, the correct reference for README gen)
-- Where studies conflict, B wins — lazy-skill-drop generates README.md files, not SKILL.md
-
-### Structural targets (study B)
+### Structural targets
 
 ```
 hook_words:       13    avg  (range 9–16; both studies agree)

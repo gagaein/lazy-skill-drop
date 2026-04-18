@@ -33,22 +33,22 @@ facilitate, holistic, crucial, ever-evolving
 
 1. Chatbot openers: "Certainly!", "Of course!", "Absolutely!"
 2. Em-dash >3 per paragraph
-7. Synonym cycling: 4+ synonyms for the same noun in one paragraph
-9. Vague attribution: "Experts believe", "Studies show"
-10. Conclusion cliché: "In summary", "In conclusion", "The future looks bright"
-11. Model leak: "As of my last update", "I don't have real-time data"
-12. Title Case in subheadings
+3. Synonym cycling: 4+ synonyms for the same noun in one paragraph
+4. Vague attribution: "Experts believe", "Studies show"
+5. Conclusion cliché: "In summary", "In conclusion", "The future looks bright"
+6. Model leak: "As of my last update", "I don't have real-time data"
+7. Title Case in subheadings
 
 ### Soft flags (flag once, explain, do not block)
 
 These patterns appear occasionally in high-quality technical writing. Flag once if found,
 but do not treat as a fail on their own:
 
-3. Negative parallelism: "It's not X, it's Y" — fine once; repetitive use is the tell
-4. Three-strawman: "Not X. Not Y. It's Z." — only a problem when done 3+ times per page
-5. Era statement: "It's never been easier to X" — rare; flag if present but don't block
-6. Command pair: "Stop X. Start Y." — legitimate in instructional content; flag if formulaic
-8. Copula avoidance: "serves as", "functions as" — common in technical docs; only flag if 3+
+1. Negative parallelism: "It's not X, it's Y" — fine once; repetitive use is the tell
+2. Three-strawman: "Not X. Not Y. It's Z." — only a problem when done 3+ times per page
+3. Era statement: "It's never been easier to X" — rare; flag if present but don't block
+4. Command pair: "Stop X. Start Y." — legitimate in instructional content; flag if formulaic
+5. Copula avoidance: "serves as", "functions as" — common in technical docs; only flag if 3+
 
 ## Rhythm check
 

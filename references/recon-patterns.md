@@ -18,7 +18,7 @@ Run before Phase B (Forge). Produces market verdict, moats assessment, and posit
 ## Per-candidate signals (extract 6)
 
 1. Last commit date → feeds Status axis
-2. Star count — primary activity signal for now (install count deferred, see Future work)
+2. Use skills.sh install count when available; fall back to GitHub stars
 3. README first 500 words
 4. Description verb (apply/pick/generate/scan/build/drop) → feeds Bucket axis
 5. Explicit non-goals ("if you need X, use Y")
@@ -62,24 +62,17 @@ Count Direct-Live candidates; counts below use Live-only unless stated.
 
 Tangential candidates inform naming (Phase N) but do not count toward verdict thresholds.
 
-## Position draft templates
+## Position draft
 
-```
-UNCLAIMED            → "First-class skill for [problem]. Nothing like it exists yet."
-EMERGING             → "Built for [wedge] in the emerging [category] space."
-CROWDED_DIFF         → "{top_adjacent_1} and {top_adjacent_2} let you [A] but assume [B]. This one does [B]."
-SATURATED            → "[Attribute]-focused [category]. While others [approach], this one [different]."
-HEAD_ON              → Either "10x [axis]" or rename to "[Category] for [niche]."
-DECLINING            → "Modernized [old category] for [new reality]" or exit.
-```
+Output one draft sentence per verdict type using templates from Phase C (SKILL.md).
+Write the draft into recon-log.md; Phase C will refine and confirm with the user.
 
 ## Category Creation red lines (do NOT recommend if ANY apply)
 
-1. Runway < 18 months
-2. No demonstrable 10x
+1. No demonstrable 10x advantage
+2. Runway < 18 months
 3. No media bandwidth (blog cadence / conferences / vocabulary work)
-4. Bootstrapped / lean
-5. Motivation is "avoiding a crowded category"
+4. Motivation is solely "avoiding a crowded category" (not genuine differentiation)
 
 Default to Attribute Positioning or Subcategory Creation for personal skills.
 
