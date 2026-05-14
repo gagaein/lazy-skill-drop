@@ -372,8 +372,13 @@ def main():
         # in auto mode, still create PR but mark for auto-merge
         # (gh auto-merge requires branch protection — just note it)
 
-    create_pr(pr_body, week, args.dry_run)
+    # Order matters: append_evolution_log writes memory/evolution-log.md;
+    # create_pr then `git add`s that file along with viral-patterns.md and
+    # commits both onto a new evolution/ branch before opening the PR.
+    # Reversing this leaves create_pr with nothing to commit, the branch
+    # ends up identical to main, and `gh pr create` aborts.
     append_evolution_log(delta, cap_changes, args.dry_run)
+    create_pr(pr_body, week, args.dry_run)
 
     print(f"[propose] done. {len(cap_changes)} capability change(s) proposed.")
 
