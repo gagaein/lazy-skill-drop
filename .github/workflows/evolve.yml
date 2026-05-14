@@ -21,6 +21,15 @@ jobs:
         with:
           python-version: "3.11"
 
+      - name: Identity guard (gate — must pass before any evolution)
+        run: |
+          cd ${{ github.workspace }}
+          # Mission anchor lives in references/core-identity.md.
+          # If any invariant family is missing from README.md or SKILL.md,
+          # the project has already drifted off-mission — refuse to evolve it
+          # further; freeze for human investigation.
+          python scripts/identity_guard.py
+
       - name: Scan GitHub trending
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -51,7 +60,8 @@ jobs:
           #   SKILL.md (body/phases), references/naming-patterns.md (core-principles),
           #   references/anti-ai-patterns.md, references/skill-md-rules.md,
           #   references/readme-rules.md, references/recon-patterns.md,
-          #   references/extract-patterns.md
+          #   references/extract-patterns.md,
+          #   references/core-identity.md (mission anchor — see identity_guard.py)
           # AUTO-UPDATE scope (knowledge layer only):
           git add references/viral-patterns.md references/formula-history.md references/naming-patterns.md
           git diff --cached --quiet || git commit -m "chore(knowledge): update knowledge layer ${{ steps.delta.outputs.status }} score=${{ steps.delta.outputs.score }}"

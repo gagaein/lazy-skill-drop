@@ -1,7 +1,7 @@
 # lazy-skill-drop
 `git clone https://github.com/gagaein/lazy-skill-drop ~/.claude/skills/lazy-skill-drop`
 
-Say "ship it" and your skill goes live with a README that copies what's working this week.
+Recon competitors, forge README + SKILL.md from this week's viral formula, ship in one confirm.
 
 - Recon before forge — scans 4 axes (exact, domain+verb, category, cross-ecosystem across 12+ agent platforms), tags every competitor `bucket=Direct|Adjacent|Tangential, status=Live|Dead`, returns one of 6 verdicts (UNCLAIMED → HEAD_ON_COLLISION)
 - Names + writes README + SKILL.md against this week's viral formula from real install data: 9–16 word hook, install at line 2, 350–450 word body, position statement, concrete example, type-aware bullet count
