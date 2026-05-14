@@ -1,11 +1,14 @@
 ---
 name: lazy-skill-drop
-description: Use when the user just finished designing a Claude skill and says "ship
-  it", "/drop", "发布这个skill", "publish this", "help me ship this", "push to github",
-  "我想把它开源", "write the README for my skill", "lazydrop", or otherwise wants a
-  finished skill design turned into a released GitHub repo without filling out
-  forms. Also triggers on "how do I get others to find my skill".
-version: 3.0.0
+description: Use when the user wants help bringing a new Claude skill to life — says
+  "I want to build a skill that [does X]", "我想开发一个 [X] 技能", "I want to develop
+  a [name] skill", "我想做一个能 [X] 的 skill", "帮我设计一个 skill", "I'm building a
+  skill for [purpose]", "/lazydrop", or otherwise wants competitor recon, a
+  differentiated design, viral-formula docs, and one-confirm GitHub release. Also
+  triggers (back-compat) on "ship it" / "发布这个 skill" / "publish this" / "push to
+  github" / "我想把它开源" when the user has finished designing in the conversation
+  and just wants the release pipeline.
+version: 4.0.0
 formula_version: w2026-17
 last_scanned: 2026-04-17
 drift_threshold: 0.20
@@ -88,32 +91,62 @@ If `gh auth status` already passes and `gh api user --jq .login` returns the cor
 
 ---
 
-## Phase A — Extract (silent, no form)
+## Phase A — Capture intent (two stages, silent, no forms)
 
-Read the full current conversation. Extract:
+The trigger can be either of two patterns. Phase A behaves differently per pattern:
+
+**Pattern 1 — "I want to build" (primary, idea-stage)**
+Examples: `I want to build a skill that [does X]`, `我想开发一个 [X] 技能`, `I want to develop a [name] skill`, `帮我设计一个 skill`.
+
+Run Phase A in **two stages**:
+
+- **A1 — light intent capture (before Phase R):** extract just `problem` (1 sentence: who, what pain). If the user only named the skill ("I want to build a doodle parser") without a problem, ask ONE question: "What's the core problem this skill solves?" Then proceed to Phase R immediately — don't continue extracting.
+- **A2 — detail extract (after Phase R):** with the recon verdict in hand, return and extract `mechanism` / `result` / `miss` / `install_cmd` from the conversation. Ask at most one question per genuinely-missing field; never ask all four as a form.
+
+**Pattern 2 — "ship it" (back-compat, finished-stage)**
+Examples: `ship it`, `发布这个 skill`, `publish this`, `push to github`, `我想把它开源`.
+
+The user has already designed the skill earlier in this conversation. Run Phase A in **one pass** — extract all five fields from prior context. If a required field is genuinely missing, ask ONE question per field. Never ask all five as a form. Proceed to Phase R after extract; Recon is still required.
+
+**Field map (both patterns):**
 
 - **problem**: the specific pain this skill solves (1 sentence) → feeds Phase C + README hook
 - **mechanism**: what the skill does internally (1 sentence) → feeds Phase B2 workflow section
 - **result**: the concrete outcome after using this skill (1 sentence) → feeds README bullets
-- **miss**: what existing tools miss (1 sentence, concrete) → feeds Phase C as user's own framing
+- **miss**: what existing tools miss (1 sentence) → optional if Phase R surfaces it; only extract if user explicitly stated it
 - **install_cmd**: any `git clone` / `cp` / `npx` command mentioned → feeds README line 2
 
-Rules:
-- Extract from the conversation — do not ask the user to repeat what they already said
-- If a required field is genuinely missing and can't be inferred, ask ONE question to fill it
-- Never ask all five as a form or checklist
-- `miss` is optional if Phase R will surface it — only extract if user explicitly stated it
-- If the user said "ship it" with no prior context, ask: "Which skill should I publish, and what does it do?"
+**Common rule:** never ask the user to repeat what they already said; mine the conversation first.
 
 ---
 
-## Phase R — Recon (market verdict before forging)
+## Phase R — Recon (market verdict + Go/No-Go before forging)
 
 Read `references/recon-patterns.md`. Run 4-axis search, classify each candidate as `bucket=Direct|Adjacent|Tangential, status=Live|Dead`, assess own skill against the 5-item Moats checklist, emit verdict + `position_statement` draft.
 
 Write `{verdict, top-3 adjacent, moats y/n/partial, position draft}` to `memory/recon-log.md`. propose.py reads this to detect category-level drift across weeks.
 
-If verdict is `HEAD_ON_COLLISION` and Moats checklist has ≤1 Yes, surface this to the user **before asking "Positioning locked?"** in Phase C. Do not auto-block — user may have a valid 10x thesis.
+**Go/No-Go surface (idea-stage trigger only):**
+
+When the trigger was Pattern 1 ("I want to build…"), the user hasn't committed time yet — this is the cheap point to redirect them. Show the recon summary before proceeding to Phase C:
+
+```
+Recon: {verdict}
+Top-3 adjacent (live):
+  - {skill1} ({installs}) — {one-line scope}
+  - {skill2} ({installs}) — {one-line scope}
+  - {skill3} ({installs}) — {one-line scope}
+Moats checklist: {n_yes}/5 yes
+Position draft: "{sentence}"
+```
+
+Then:
+
+- If verdict is `SATURATED` / `HEAD_ON_COLLISION` **and** Moats has ≤1 Yes → ask: "This space is crowded and your moats are thin. Continue anyway, pivot the scope, or stop here? (continue / pivot / stop)"
+- If verdict is `CROWDED_BUT_DIFFERENTIABLE` / `EMERGING` / `UNCLAIMED` → proceed to Phase C silently after showing the summary.
+- If user answers `stop` → save recon-log and exit cleanly. Do not auto-block — user may also have a valid 10x thesis and answer `continue`.
+
+**Pattern 2 ("ship it") path:** the user has already invested in building, so the Go/No-Go question is moot. Still run recon and write `recon-log.md` (so propose.py can track drift), but skip the user-facing summary unless `HEAD_ON_COLLISION` + ≤1 moat — in which case still surface, since they're about to publish a likely-duplicate.
 
 ---
 
@@ -177,7 +210,57 @@ Name candidates (can change in the final confirm):
   [name-3]  [one-line rationale]
 ```
 
-Pick the recommended one and proceed to Phase B. The user can change the name during Phase D — no separate confirmation needed here.
+Pick the recommended one and proceed to Phase DA. The user can change the name during Phase D — no separate confirmation needed here.
+
+---
+
+## Phase DA — Differentiated Architecture (between Name and Forge)
+
+This is the heart of the new flow. After Recon + Position + Name, but before writing any files, lazydrop drafts the **scope** and **file structure** of the user's skill so it (a) avoids duplicating Direct competitors and (b) inherits the structural shape of currently top-installed skills.
+
+**Inputs:**
+- `memory/recon-log.md` — top-3 adjacent skills + their in-scope/out-of-scope
+- `references/viral-patterns.md` — current top-N skills by install count
+- Phase A extract — `problem`, `mechanism`, `result`
+- Phase C — locked position sentence
+
+**Internal output (write to `memory/design-log.md`, never shown to user):**
+- Full scope diff against each adjacent competitor
+- Full structural references — every dimension borrowed from a top-installed skill, with that skill's install count and the source dimension
+- Phase / scripts / references file recommendations with statistical backing where available
+
+**User-facing output (keep it short — name the references, not the stats):**
+
+```
+Proposed design for "{skill_name}":
+
+  Scope:
+    - In:  {3–5 bullets, plain English}
+    - Not in scope (use {competitor} for these):
+      - {competitor1} handles {their_in_scope}
+      - {competitor2} handles {their_in_scope}
+
+  Modeled on:
+    - {skill1} ({install_count}) — reference for {dimension, plain language}
+    - {skill2} ({install_count}) — reference for {dimension, plain language}
+    - {skill3} ({install_count}) — reference for {dimension, plain language}
+
+  Proposed files:
+    - SKILL.md
+    - scripts/{x}.py
+    - references/{y}.md
+    - references/{z}.md
+```
+
+Then ask: **"Design looks right? (y / change X / drop X)"**
+
+- `y` → lock the design; write final structure into `memory/design-log.md`; proceed to Phase B.
+- `change X` → adjust the proposed bit, re-show the full block from the top.
+- `drop X` → remove the proposed item, re-show.
+
+**Reference-skill selection rule (v1):** read `references/viral-patterns.md`; pick the top 2–3 by install count whose category overlaps the user's `problem`. State each reference's specific contribution in plain language (e.g. "directory layout", "SKILL.md phase pattern", "README length budget"). **Do not surface raw stats** (mode, median, n=…) to the user — those stay in `memory/design-log.md`.
+
+**Fabrication red line:** every reference skill named must be a real skill currently present in `references/viral-patterns.md`. Do not invent reference skills or invent install counts. If `viral-patterns.md` has fewer than 2 skills in the user's category, fall back to "Modeled on the project's own conventions; cross-category references unavailable this week." and explain why in one sentence.
 
 ---
 
@@ -385,6 +468,7 @@ All reference files are AI-operational: rules only, no citations, no methodology
 | `references/formula-history.md` | evolve cycle only (delta.py reads for trend prediction) |
 | `memory/performance-log.md` | On activation (startup) |
 | `memory/recon-log.md` | Phase C (Position) — read to pull verdict + top adjacent |
+| `memory/design-log.md` | Phase DA — write final design; future runs may read to detect scope drift |
 | `memory/evolution-log.md` | Only when debugging evolution |
 | `memory/pr-bodies.md` | Only when user asks to see PR text |
 

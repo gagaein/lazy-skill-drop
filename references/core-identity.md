@@ -50,6 +50,13 @@ The weekly self-evolution loop (scan → delta → propose PR) **serves** these 
 - "SKILL.md.*README"
 - "two-document"
 
+### family_differentiate
+- "differentiated"
+- "different"
+- "modeled on"
+- "where.*gap"
+- "positioned"
+
 ## Anti-drift structural constraints (not regex-checked, human-checked)
 
 - Phase R (Recon) must remain in SKILL.md
