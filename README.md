@@ -1,5 +1,5 @@
 # lazy-skill-drop
-`git clone https://github.com/you/lazy-skill-drop ~/.claude/skills/lazy-skill-drop`
+`git clone https://github.com/gagaein/lazy-skill-drop ~/.claude/skills/lazy-skill-drop`
 
 Turn this week's GitHub trending into your skill's README — then ship it in 30 seconds.
 
