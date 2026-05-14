@@ -327,19 +327,29 @@ def create_pr(pr_body: str, week: str, dry_run: bool):
         return rc
 
     step("checkout branch", ["git", "checkout", "-b", branch])
-    # Stage everything the evolve loop is allowed to touch; -A picks up the
-    # archive file (memory/evolution-log-archive.md) that enforce_max_lines
-    # may have written but the explicit `git add` list did not mention.
+    # Stage every file in the evolve loop's documented AUTO-UPDATE scope.
+    # ELOG_ARCH (memory/evolution-log-archive.md) only exists once
+    # enforce_max_lines has rotated the log — filter on existence so a fresh
+    # repo doesn't fail with `pathspec ... did not match any files`.
+    stage_targets = [
+        PATTERNS_PATH,
+        ELOG,
+        SKILL_ROOT / "references" / "formula-history.md",
+        SKILL_ROOT / "references" / "naming-patterns.md",
+    ]
+    if ELOG_ARCH.exists():
+        stage_targets.append(ELOG_ARCH)
     step("stage knowledge + evolution-log",
-         ["git", "add",
-          str(PATTERNS_PATH),
-          str(ELOG),
-          str(ELOG_ARCH),
-          str(SKILL_ROOT / "references" / "formula-history.md"),
-          str(SKILL_ROOT / "references" / "naming-patterns.md")])
+         ["git", "add"] + [str(p) for p in stage_targets])
     step("commit", ["git", "commit", "-m", f"chore: knowledge layer update {week}"],
          allow_fail=True)  # OK if nothing new to commit beyond knowledge layer
-    step("push branch", ["git", "push", "--set-upstream", "origin", branch])
+    # --force-with-lease: each evolve run overwrites its own bot branch with
+    # the latest formula commits; any existing PR receives the new commits
+    # automatically. The --force-with-lease (not bare --force) variant aborts
+    # if someone hand-pushed to the branch between runs, so it can't silently
+    # clobber human edits.
+    step("push branch",
+         ["git", "push", "--force-with-lease", "--set-upstream", "origin", branch])
 
     # write PR body to a temp file
     tmp = Path("/tmp/pr_body.md")
