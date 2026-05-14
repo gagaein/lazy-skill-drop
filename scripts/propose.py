@@ -361,8 +361,26 @@ def create_pr(pr_body: str, week: str, dry_run: bool):
     ])
     if code == 0:
         print(f"  ✓ PR created: {out}")
-    else:
-        print(f"  ✗ gh pr create failed: {err}", file=sys.stderr)
+        return
+
+    # gh pr create aborts with "already exists" when a previous evolve tick
+    # already opened the PR for this same branch. force-with-lease has just
+    # updated the branch tip, so the existing PR automatically picks up the
+    # new commits — refresh its body to match the latest delta and treat
+    # this as success.
+    if "already exists" in err:
+        rc2, url, _ = run(["gh", "pr", "view", branch, "--json", "url", "--jq", ".url"])
+        existing_pr = url or "(unknown)"
+        rc3, _, edit_err = run([
+            "gh", "pr", "edit", branch, "--body-file", str(tmp),
+        ])
+        if rc3 == 0:
+            print(f"  ✓ PR already exists — body refreshed: {existing_pr}")
+        else:
+            print(f"  ✓ PR already exists ({existing_pr}); body refresh skipped: {edit_err}")
+        return
+
+    print(f"  ✗ gh pr create failed: {err}", file=sys.stderr)
 
 
 # ── main ──────────────────────────────────────────────────────────────────────
