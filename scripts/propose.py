@@ -327,19 +327,17 @@ def create_pr(pr_body: str, week: str, dry_run: bool):
         return rc
 
     step("checkout branch", ["git", "checkout", "-b", branch])
-    # Stage every file in the evolve loop's documented AUTO-UPDATE scope.
-    # ELOG_ARCH (memory/evolution-log-archive.md) only exists once
-    # enforce_max_lines has rotated the log — filter on existence so a fresh
-    # repo doesn't fail with `pathspec ... did not match any files`.
+    # Stage the same scope the evolve workflow's "Commit knowledge layer
+    # update" step uses. memory/*.md (evolution-log + archive) are gitignored
+    # by project design — runtime telemetry, never tracked — so don't try to
+    # stage them or git will print `paths are ignored by one of your
+    # .gitignore files` and exit 1.
     stage_targets = [
         PATTERNS_PATH,
-        ELOG,
         SKILL_ROOT / "references" / "formula-history.md",
         SKILL_ROOT / "references" / "naming-patterns.md",
     ]
-    if ELOG_ARCH.exists():
-        stage_targets.append(ELOG_ARCH)
-    step("stage knowledge + evolution-log",
+    step("stage knowledge layer",
          ["git", "add"] + [str(p) for p in stage_targets])
     step("commit", ["git", "commit", "-m", f"chore: knowledge layer update {week}"],
          allow_fail=True)  # OK if nothing new to commit beyond knowledge layer
