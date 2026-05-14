@@ -43,6 +43,9 @@ Rules for generating any SKILL.md. Reader is Claude, not humans.
 - "About this skill" / "Why we built this" sections.
 - Author bio, credits, crypto/coin references.
 - Install commands, badges, stars (those go in README.md).
+- Fabricated institutional affiliation ("at MIT", "by Anthropic / OpenAI / Google", "Stanford lab") — never insert in description / overview / phase text unless the user explicitly confirmed it in the conversation.
+- Fabricated endorsements or partnerships ("endorsed by X", "official partner of Y") — only when user provided evidence.
+- Fabricated certifications or compliance claims ("OWASP-certified", "SOC 2") — only when user can show proof.
 
 ## Required in SKILL.md
 

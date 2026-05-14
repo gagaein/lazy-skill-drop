@@ -96,6 +96,7 @@ SKILL.md:
 - **d5**: 350-450 word README budget kept (readme-rules.md).
 - **d6**: identity_guard adds new family_differentiate to protect the differentiation thesis from being silently dropped in future formula iterations.
 - **d7**: old README archived to history/v2/README.md (the prior "Recon competitors, forge..." version). This is v3.
+- **d8** (v3.1 patch, 2026-05-14): user flagged "MIT" in README footer as readable as "麻省理工 affiliation" in CN context. Two fixes: (a) own README footer changed to `Open-source under the [MIT License](LICENSE) — license name, not an institutional affiliation`; (b) readme-rules.md + skill-md-rules.md gain banned-content bullets covering fabricated institutional affiliation, endorsements, certifications, and (README only) short-form license names. These rules govern any skill lazydrop forges in Phase B.
 
 ## cases — concrete examples surfaced in README
 

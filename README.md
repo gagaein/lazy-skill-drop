@@ -39,4 +39,4 @@ gh auth login
 That's it. lazydrop takes over from there.
 
 ---
-MIT · built by [@gagaein](https://github.com/gagaein) · works with Claude Code, Cursor, Codex, Gemini CLI, OpenCode, and any agent supporting [Agent Skills](https://agentskills.io). Pure Python stdlib + `gh` CLI — no npm, no Docker, no API keys.
+Open-source under the [MIT License](LICENSE) — license name, not an institutional affiliation · built by [@gagaein](https://github.com/gagaein) · works with Claude Code, Cursor, Codex, Gemini CLI, OpenCode, and any agent supporting [Agent Skills](https://agentskills.io). Pure Python stdlib + `gh` CLI — no npm, no Docker, no API keys.

@@ -79,6 +79,10 @@ Do NOT fabricate competitors. If you cannot name real adjacent tools, skip this 
 - Workflow-summary verbs as primary framing ("This skill reads X, extracts Y, publishes Z")
 - Tier-1 anti-ai words without a number backing them (see anti-ai-patterns.md)
 - Title Case in subheadings — use sentence case
+- Fabricated institutional affiliation ("built at MIT", "developed at Anthropic / OpenAI / Google", "from Stanford lab") — only state when user explicitly confirmed in conversation
+- Fabricated endorsements or partnerships ("endorsed by X", "official partner of Y", "in collaboration with Z") — only when user provided evidence
+- Fabricated certifications or compliance claims ("OWASP-certified", "SOC 2 compliant", "GDPR ready") — only when user can show proof
+- License short-form that reads as institutional ("MIT" alone, "BSD" alone, "Apache" alone) — spell the full license name and link the LICENSE file ("[MIT License](LICENSE)", "[Apache License 2.0](LICENSE)", "[BSD-3-Clause](LICENSE)"). The bare three-letter forms get misread as university/company names in non-English contexts.
 
 ## Viral vs anti-ai conflict
 
