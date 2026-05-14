@@ -97,6 +97,7 @@ SKILL.md:
 - **d6**: identity_guard adds new family_differentiate to protect the differentiation thesis from being silently dropped in future formula iterations.
 - **d7**: old README archived to history/v2/README.md (the prior "Recon competitors, forge..." version). This is v3.
 - **d8** (v3.1 patch, 2026-05-14): user flagged "MIT" in README footer as readable as "麻省理工 affiliation" in CN context. Two fixes: (a) own README footer changed to `Open-source under the [MIT License](LICENSE) — license name, not an institutional affiliation`; (b) readme-rules.md + skill-md-rules.md gain banned-content bullets covering fabricated institutional affiliation, endorsements, certifications, and (README only) short-form license names. These rules govern any skill lazydrop forges in Phase B.
+- **d9** (v3.2, 2026-05-14): d4 lifted — scan.py now fetches each repo's recursive git tree and extracts structural shape (scripts/ / references/ / memory/ presence + file counts + layout label: full-pipeline / rules-pack / tool-only / single-file). Writes `references/architecture-patterns.md` per scan; file carries its own "Reference selection rule for Phase DA" section. Phase DA (SKILL.md) now reads architecture-patterns.md as primary source for "modeled on" picks, falling back to viral-patterns.md if architecture-patterns is empty/stale. architecture-patterns.md added to workflow's AUTO-UPDATE allowlist and propose.py's stage_targets (mirrors the existing 3 knowledge-layer files).
 
 ## cases — concrete examples surfaced in README
 

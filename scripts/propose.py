@@ -336,6 +336,7 @@ def create_pr(pr_body: str, week: str, dry_run: bool):
         PATTERNS_PATH,
         SKILL_ROOT / "references" / "formula-history.md",
         SKILL_ROOT / "references" / "naming-patterns.md",
+        SKILL_ROOT / "references" / "architecture-patterns.md",
     ]
     step("stage knowledge layer",
          ["git", "add"] + [str(p) for p in stage_targets])

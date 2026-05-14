@@ -98,6 +98,19 @@ def fetch_readme(repo_full_name: str, token: str | None) -> str:
         return ""
 
 
+def fetch_tree(repo_full_name: str, default_branch: str, token: str | None) -> list[str]:
+    """Return list of file paths in the repo's default branch (recursive).
+    One API call per repo. Truncated trees (very large repos) still return
+    what fits; we only care about top-level directories which always do."""
+    url = f"https://api.github.com/repos/{repo_full_name}/git/trees/{default_branch}?recursive=1"
+    try:
+        data = gh_get(url, token)
+        return [item["path"] for item in data.get("tree", []) if item.get("type") in ("blob", "tree")]
+    except Exception as e:
+        print(f"  [warn] tree fetch failed for {repo_full_name}: {e}", file=sys.stderr)
+        return []
+
+
 # ── DNA extractors ────────────────────────────────────────────────────────────
 
 def extract_hook(readme: str) -> dict:
@@ -202,6 +215,48 @@ def extract_numbers_in_first_lines(readme: str) -> bool:
     return bool(re.search(r"\b\d+\b", text))
 
 
+def extract_architecture(tree_paths: list[str]) -> dict:
+    """Top-level directory presence + file counts. Inputs Phase DA's
+    'modeled on' reference picker. v1 scope: scripts / references / memory
+    only — these are the dirs that distinguish full-pipeline skills from
+    single-file ones. Phase count (would need SKILL.md content fetch) is
+    deferred."""
+    def count_in(prefix: str) -> int:
+        # files directly under {prefix}/ (no nested subdirs)
+        return sum(
+            1 for p in tree_paths
+            if p.startswith(prefix) and "/" not in p[len(prefix):]
+        )
+
+    has_skill_md  = any(p == "SKILL.md" for p in tree_paths)
+    scripts_files = count_in("scripts/")
+    refs_files    = count_in("references/")
+    memory_files  = count_in("memory/")
+
+    # Layout label — what kind of skill is this structurally?
+    if scripts_files > 0 and refs_files > 0:
+        layout = "full-pipeline"     # scripts + references (+ optional memory)
+    elif refs_files > 0:
+        layout = "rules-pack"        # references only, no scripts
+    elif scripts_files > 0:
+        layout = "tool-only"         # scripts only, no references
+    elif has_skill_md:
+        layout = "single-file"       # SKILL.md only, no subdirs
+    else:
+        layout = "no-skill-md"       # not actually a skill repo (rare)
+
+    return {
+        "has_skill_md":   has_skill_md,
+        "has_scripts":    scripts_files > 0,
+        "has_references": refs_files > 0,
+        "has_memory":     memory_files > 0,
+        "scripts_files":  scripts_files,
+        "refs_files":     refs_files,
+        "memory_files":   memory_files,
+        "layout":         layout,
+    }
+
+
 def get_star_velocity(repo: dict) -> float:
     """Approximate stars/day from creation date and current star count."""
     try:
@@ -278,6 +333,7 @@ ISO_WEEK = datetime.now(timezone.utc).strftime("w%Y-%V")
 GENERATED_AT = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
 NAMING_OUT  = SKILL_ROOT / "references" / "naming-patterns.md"
+ARCH_OUT    = SKILL_ROOT / "references" / "architecture-patterns.md"
 SCAN_START  = "<!-- SCAN_SECTION_START — do not edit below this line manually -->"
 SCAN_END    = "<!-- SCAN_SECTION_END -->"
 
@@ -427,6 +483,85 @@ def write_patterns(content: str, dry_run: bool):
     print(f"  ✓ wrote {PATTERNS_OUT}")
 
 
+def render_architecture(repos: list[dict], week: str) -> str:
+    """Render references/architecture-patterns.md — Phase DA's input.
+
+    Per-skill rows show the structural shape (layout label + dir presence
+    + file counts). Aggregate section shows mode/share so Phase DA can
+    say "modeled on {skill}" with a real basis. Reference-selection rule
+    at the bottom matches the rule documented in SKILL.md Phase DA."""
+    n = len(repos)
+    layouts = [r.get("layout", "unknown") for r in repos]
+
+    def share(value: str) -> str:
+        c = layouts.count(value)
+        return f"{c}/{n} ({round(c/n*100) if n else 0}%)"
+
+    rows = []
+    for r in sorted(repos, key=lambda x: -x.get("stars", 0)):
+        slug = r.get("full_name", "?")
+        rows.append(
+            f"| {slug} | {r.get('stars',0)} | {r.get('layout','?')} | "
+            f"{'✓' if r.get('has_scripts') else '—'} | "
+            f"{'✓' if r.get('has_references') else '—'} | "
+            f"{'✓' if r.get('has_memory') else '—'} | "
+            f"{r.get('scripts_files',0)} | {r.get('refs_files',0)} |"
+        )
+    table = "\n".join(rows)
+
+    return f"""---
+max_lines: 80
+version: {week}
+role: AI-operational
+evolution: auto-updated by scripts/scan.py weekly
+---
+
+# Architecture Patterns
+
+**Week:** {week} | **Sample:** {n} skills by install/star count
+**Generated:** {GENERATED_AT}
+
+## Layout distribution
+
+- `full-pipeline`  (scripts/ + references/):  {share("full-pipeline")}
+- `rules-pack`     (references/ only):        {share("rules-pack")}
+- `tool-only`      (scripts/ only):           {share("tool-only")}
+- `single-file`    (SKILL.md only):           {share("single-file")}
+
+## Per-skill architecture (sorted by stars)
+
+| Skill | Stars | Layout | scripts/ | refs/ | memory/ | scripts files | refs files |
+|---|---|---|---|---|---|---|---|
+{table}
+
+## Reference selection rule for Phase DA
+
+Read this file in Phase DA. Pick 2–3 reference skills as follows:
+
+1. Filter to skills whose `layout` matches the user's proposed scope.
+   - If the user is building a pipeline (scripts + rules): prefer `full-pipeline` skills.
+   - If the user is building a rules pack: prefer `rules-pack` skills.
+   - If the user is building a single tool: prefer `tool-only` or `single-file`.
+2. Within the filtered set, pick top 2–3 by stars.
+3. For each picked skill, state in plain language the one dimension it's the reference for (e.g. "directory layout", "references/ file count", "scripts/ size"). Do not surface raw counts to the user.
+4. If filtering produces <2 results, fall back to top 2–3 overall by stars and note the layout mismatch in `memory/design-log.md` (internal only).
+
+## Fabrication red line
+
+Never invent a skill name or star count. Every reference cited in Phase DA must appear in the per-skill table above. If this file is empty or stale (>14 days since last scan), tell the user "structural references are unavailable this week" rather than fabricate.
+"""
+
+
+def write_architecture(content: str, dry_run: bool):
+    if dry_run:
+        print("── architecture-patterns.md (dry run) ─────────────────")
+        print(content[:600])
+        return
+    ARCH_OUT.parent.mkdir(parents=True, exist_ok=True)
+    ARCH_OUT.write_text(content, encoding="utf-8")
+    print(f"  ✓ wrote {ARCH_OUT}")
+
+
 def append_history(content: str, dry_run: bool):
     separator = "─" * 60 + "\n"
     entry = separator + content
@@ -509,6 +644,7 @@ def main():
 
     # ── extract DNA ───────────────────────────────────────────────────────────
     repo_dnas: list[dict] = []
+    arch_rows: list[dict] = []
     for repo in repos:
         name = repo["full_name"]
         print(f"  → {name} ({repo.get('stargazers_count',0)} ★)")
@@ -536,6 +672,11 @@ def main():
         repo["star_velocity"] = dna["star_velocity"]
         repo_dnas.append(dna)
 
+        # ── architecture extraction (Phase DA input) ──
+        tree = fetch_tree(name, repo.get("default_branch", "main"), token)
+        arch = extract_architecture(tree)
+        arch_rows.append({"full_name": name, "stars": dna["stars"], **arch})
+
     agg = aggregate(repo_dnas)
     content = render_patterns(agg, repos)
 
@@ -543,6 +684,7 @@ def main():
     enforce_patterns_length(args.dry_run)
     append_history(content, args.dry_run)
     update_naming_patterns(repos, args.dry_run)
+    write_architecture(render_architecture(arch_rows, ISO_WEEK), args.dry_run)
     update_last_scanned(args.dry_run)
 
     print("[scan] done.")

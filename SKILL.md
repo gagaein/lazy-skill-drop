@@ -220,7 +220,8 @@ This is the heart of the new flow. After Recon + Position + Name, but before wri
 
 **Inputs:**
 - `memory/recon-log.md` — top-3 adjacent skills + their in-scope/out-of-scope
-- `references/viral-patterns.md` — current top-N skills by install count
+- `references/architecture-patterns.md` — per-skill layout + the file's own reference-selection rule (primary source for "modeled on" picks)
+- `references/viral-patterns.md` — current top-N skills by install count (fallback when architecture-patterns is empty or stale)
 - Phase A extract — `problem`, `mechanism`, `result`
 - Phase C — locked position sentence
 
@@ -258,7 +259,7 @@ Then ask: **"Design looks right? (y / change X / drop X)"**
 - `change X` → adjust the proposed bit, re-show the full block from the top.
 - `drop X` → remove the proposed item, re-show.
 
-**Reference-skill selection rule (v1):** read `references/viral-patterns.md`; pick the top 2–3 by install count whose category overlaps the user's `problem`. State each reference's specific contribution in plain language (e.g. "directory layout", "SKILL.md phase pattern", "README length budget"). **Do not surface raw stats** (mode, median, n=…) to the user — those stay in `memory/design-log.md`.
+**Reference-skill selection rule (v2):** read `references/architecture-patterns.md` and follow its "Reference selection rule for Phase DA" section (filter by layout match → top 2–3 by stars → state one plain-language dimension per reference). If `architecture-patterns.md` is empty or its frontmatter `version` is >14 days old, fall back to `references/viral-patterns.md` top-3-by-install with a note in `memory/design-log.md`. In every case: state each reference's contribution in plain language (e.g. "directory layout", "scripts/ size", "references/ file count"). **Do not surface raw stats** (mode, median, n=…) to the user — those stay in `memory/design-log.md`.
 
 **Fabrication red line:** every reference skill named must be a real skill currently present in `references/viral-patterns.md`. Do not invent reference skills or invent install counts. If `viral-patterns.md` has fewer than 2 skills in the user's category, fall back to "Modeled on the project's own conventions; cross-category references unavailable this week." and explain why in one sentence.
 
@@ -464,6 +465,7 @@ All reference files are AI-operational: rules only, no citations, no methodology
 | `references/anti-ai-patterns.md` | Phase P (Polish) — always |
 | `references/naming-patterns.md` | Phase N (Name) — when naming a new skill |
 | `references/recon-patterns.md` | Phase R (Recon) — before Phase C |
+| `references/architecture-patterns.md` | Phase DA — primary source for "modeled on" reference picks |
 | `references/extract-patterns.md` | Phase A (Extract) — always |
 | `references/formula-history.md` | evolve cycle only (delta.py reads for trend prediction) |
 | `memory/performance-log.md` | On activation (startup) |

@@ -63,7 +63,7 @@ jobs:
           #   references/extract-patterns.md,
           #   references/core-identity.md (mission anchor — see identity_guard.py)
           # AUTO-UPDATE scope (knowledge layer only):
-          git add references/viral-patterns.md references/formula-history.md references/naming-patterns.md
+          git add references/viral-patterns.md references/formula-history.md references/naming-patterns.md references/architecture-patterns.md
           git diff --cached --quiet || git commit -m "chore(knowledge): update knowledge layer ${{ steps.delta.outputs.status }} score=${{ steps.delta.outputs.score }}"
 
       - name: Propose capability changes
