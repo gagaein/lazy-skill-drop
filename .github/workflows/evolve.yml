@@ -32,7 +32,10 @@ jobs:
         id: delta
         run: |
           cd ${{ github.workspace }}
-          python scripts/delta.py --json > /tmp/delta.json
+          # delta.py exits with status code (0=STABLE, 1=DRIFT, 2=SHIFT, 3=PARADIGM) by design.
+          # Under `bash -e` a non-STABLE exit would abort the step before we read the JSON.
+          python scripts/delta.py --json > /tmp/delta.json || true
+          [ -s /tmp/delta.json ] || { echo "::error::delta.py produced no JSON output"; exit 1; }
           cat /tmp/delta.json
           STATUS=$(python -c "import json,sys; d=json.load(open('/tmp/delta.json')); print(d['status'])")
           SCORE=$(python  -c "import json,sys; d=json.load(open('/tmp/delta.json')); print(d['drift_score'])")
