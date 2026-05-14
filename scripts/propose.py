@@ -314,10 +314,32 @@ def create_pr(pr_body: str, week: str, dry_run: bool):
 
     # create a branch and commit knowledge layer changes
     branch = f"evolution/{week.lower()}"
-    run(["git", "checkout", "-b", branch])
-    run(["git", "add", str(PATTERNS_PATH), str(ELOG)])
-    run(["git", "commit", "-m", f"chore: knowledge layer update {week}"])
-    run(["git", "push", "--set-upstream", "origin", branch])
+
+    def step(label: str, cmd: list[str], allow_fail: bool = False) -> int:
+        """Run a git/gh step, surface stderr on failure. capture_output=True
+        was swallowing real errors (push failures, identity issues) so the
+        downstream `gh pr create` looked like the cause when it wasn't."""
+        rc, out, err = run(cmd)
+        if rc != 0 and not allow_fail:
+            print(f"  ✗ {label} failed (rc={rc}): {err or out}", file=sys.stderr)
+        elif rc == 0:
+            print(f"  ✓ {label}")
+        return rc
+
+    step("checkout branch", ["git", "checkout", "-b", branch])
+    # Stage everything the evolve loop is allowed to touch; -A picks up the
+    # archive file (memory/evolution-log-archive.md) that enforce_max_lines
+    # may have written but the explicit `git add` list did not mention.
+    step("stage knowledge + evolution-log",
+         ["git", "add",
+          str(PATTERNS_PATH),
+          str(ELOG),
+          str(ELOG_ARCH),
+          str(SKILL_ROOT / "references" / "formula-history.md"),
+          str(SKILL_ROOT / "references" / "naming-patterns.md")])
+    step("commit", ["git", "commit", "-m", f"chore: knowledge layer update {week}"],
+         allow_fail=True)  # OK if nothing new to commit beyond knowledge layer
+    step("push branch", ["git", "push", "--set-upstream", "origin", branch])
 
     # write PR body to a temp file
     tmp = Path("/tmp/pr_body.md")
