@@ -49,35 +49,29 @@ that apply to the skill you're currently naming.
 ## Viral naming patterns (AUTO-UPDATED by scan.py weekly)
 
 <!-- SCAN_SECTION_START — do not edit below this line manually -->
-**Week:** w2026-17 | **Sample:** top-20 skills by install count
+**Week:** w2026-21 | **Sample:** top-8 skills by install count
 
-### Structure distribution (top-20)
+### Structure distribution (top-8)
 
-| Structure | Count | Share | Examples |
+| Structure            | Count | Share | Examples |
 |---|---|---|---|
-| domain-noun | 7 | 35% | frontend-design, web-design-guidelines, vercel-react-best-practices |
-| verb-noun | 5 | 25% | find-skills, skill-creator, code-review |
-| brand-prefixed | 4 | 20% | microsoft-foundry, remotion-best-practices, vercel-composition-patterns |
-| portmanteau / single-word | 3 | 15% | soultrace, brainstorming, agent-browser |
-| ironic | 1 | 5% | superpowers |
+| domain-noun          |     5 |   62% | frontend-slides, obsidian-second-brain, claude-blog |
+| verb-noun            |     1 |   12% | design-extract |
+| brand-prefixed       |     0 |    0% | — |
+| portmanteau          |     2 |   25% | hue, nopua |
 
-### What correlates with high install velocity this week
+### High-velocity names this week (fastest growing)
 
-- **Brand-prefixed names** (microsoft-, vercel-, remotion-) dominate top-5 — but this is org authority, not naming quality. Not replicable for solo skills.
-- **Exact function names** among solo skills: find-skills (1.1M), skill-creator (152K) — win when the function IS the differentiator.
-- **Single-word/portmanteau** with strong identity: soultrace (132K) works because it names the experience, not the mechanism.
-- **Short beats long** among solo skills: 1-2 word names outperform 3+ word names at equivalent authority level.
+frontend-slides, design-extract, drawio-skill
 
-### Direction: what tends to produce hits (not rules)
+### Direction: what tends to produce hits
 
-Pick one of these directions — they're listed by how often they correlate with velocity:
+1. **Exact function, verb-first** — works when your differentiator IS the function (`find-skills`, `skill-creator`). Name the thing you do if you do ONE thing extremely well.
+2. **Experience/metaphor, single word** — works when the differentiator is how it *feels* (`soultrace`, `superpowers`). Creates identity, not description.
+3. **Domain-noun, clear audience** — SEO-optimized, high discovery, lower memorability (`frontend-design`, `web-design-guidelines`).
+4. **Tight portmanteau / verb-as-noun** — works when the action IS the product (`skilldrop`, `dispatch`). Must pass: "let me {name} this skill."
 
-1. **Exact function, verb-first** — works when your differentiator IS the function. `find-skills`, `skill-creator`. If you do ONE thing extremely well, name that thing.
-2. **Experience/metaphor, single word** — works when the differentiator is how it *feels*, not what it does. `soultrace`, `superpowers`, `caveman`. The name creates an identity.
-3. **Domain-noun, clear audience** — works when SEO matters more than brand. `frontend-design`, `web-design-guidelines`. Discovery-optimized, low memorability.
-4. **Verb used as noun** — tight portmanteau or single verb that can be used in a sentence. `skilldrop`, `dispatch`. Works when the action IS the product.
-
-Avoid: names that describe an internal mechanism the user never sees (scan-forge, readme-factory). If a user would never say that phrase when they need the skill, the name is too internal.
+Avoid names that describe an internal step the user never sees (scan-forge, readme-factory).
 
 <!-- SCAN_SECTION_END -->
 
