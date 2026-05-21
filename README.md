@@ -1,30 +1,39 @@
 # lazy-skill-drop
+
+[![License](https://img.shields.io/github/license/gagaein/lazy-skill-drop)](LICENSE) [![Stars](https://img.shields.io/github/stars/gagaein/lazy-skill-drop?style=social)](https://github.com/gagaein/lazy-skill-drop/stargazers) [![Topic: claude-skill](https://img.shields.io/badge/topic-claude--skill-blue)](https://github.com/topics/claude-skill)
+
+> Works with Claude Code, Cursor, Codex, Gemini CLI, OpenCode, and any agent supporting [Agent Skills](https://agentskills.io). Pure Python stdlib + `gh` CLI — no npm, no Docker, no API keys.
+
 `git clone https://github.com/gagaein/lazy-skill-drop ~/.claude/skills/lazy-skill-drop`
 
-Build a Claude skill positioned against real competitors and structured like this week's top installs.
+A Claude skill that researches GitHub before you build, so you don't ship the 47th version of someone else's skill.
 
-- **Before you write a line of code** — checks GitHub for skills already doing this, shows their install counts, tells you where the gap is. If the space is saturated without a 10x angle, you'll know before you commit time.
-- **Designs a differentiated architecture** — drafts your skill's scope and file structure based on (a) what competitors miss and (b) how this week's top-installed skills are built. Not a generic template — a template shaped by what's winning.
-- **Writes README + SKILL.md from real install data** — sentence length, install line position, hook structure, length budget all match this week's top quartile.
-- **One yes to publish** — `gh repo create` + push + PRs to 3 discovery lists. No forms, no clicking.
+- **Recon before you commit time** — scans GitHub for skills already doing what you're planning. Shows their install counts, what's in scope vs. out of scope, and a verdict (UNCLAIMED / EMERGING / CROWDED / SATURATED / HEAD_ON_COLLISION). If the space is already saturated, you find out now.
+- **Differentiated architecture proposal** — drafts your skill's scope from the competitor gap, then suggests file structure modeled on 2–3 named top-installed skills (with their install counts). Layout types: full-pipeline / rules-pack / tool-only / single-file.
+- **README + SKILL.md from real install data** — a weekly scan of trending skills measures install-line placement, length budget, hook patterns, bullet density. Your skill's docs are written to that shape.
+- **Publish in one yes** — `gh repo create` + push. Awesome-list PR bodies are pre-written and saved for you to submit manually after your repo earns organic stars.
 
 ## How it works
 
 Tell Claude `"I want to build a skill that [does X]"` (or `我想开发一个 [X] 技能`). Then:
 
-1. **Competitor scan.** Looks at GitHub for skills already doing this. Shows you who's there, how many installs they have, and where the gap is. If the space is saturated and you don't have a 10x angle, you'll hear about it before you write code.
+1. **Competitor scan.** Looks at GitHub for skills already doing this. If you're about to build the 47th slide-maker, you'll know before you write code.
 
-2. **Differentiated design.** Drafts your skill's scope from what competitors miss, and your file structure modeled on this week's top-installed skills. You see the proposal — name, files, what's in scope and what isn't, plus the 2–3 reference skills it's modeled on — and change anything you disagree with.
+2. **Differentiated design.** Drafts your skill's scope from what competitors leave out, and file structure modeled on 2–3 specific top-installed skills (named, with install counts). You see the proposal — name, files, what's in scope and what isn't — and change anything you disagree with.
 
-3. **README + SKILL.md from real data.** A weekly script measures the structural shape of winning skill docs — hook style, install-line placement, length budget, bullet density. Your skill's docs are written to that shape.
+3. **README + SKILL.md from real data.** A weekly script measures the structural shape of currently-winning skill docs — hook style, install-line placement, length budget. Your docs are written to that shape.
 
-4. **One yes to publish.** When you're happy, say so once. lazydrop creates the GitHub repo, pushes the code, and opens PRs to 3 skill-discovery lists. You see one screen, you say `y`, the rest is automatic.
+4. **Publish in one yes.** When you're happy, say so once. lazydrop creates the GitHub repo and pushes the code. Awesome-list PR bodies are saved to `memory/pr-bodies.md` for you to submit yourself after the repo earns ≥10 organic stars.
+
+## Why no auto-submit to awesome-lists?
+
+Because we read the CONTRIBUTING files. `travisvn/awesome-claude-skills` and similar curated lists explicitly close AI-generated and sub-10-star PRs without comment. Submitting on your behalf before the repo earns organic traction would burn your reputation with the exact maintainers you need. PR bodies are pre-written and ready — submit them yourself after stars accumulate. (If you have a reason to opt in earlier, `publish.py --auto-submit-prs` is still available.)
 
 ## When to use this
 
 - You have an idea for a Claude skill but haven't started yet
-- You've built something and don't know how to package it so people install it
-- You suspect someone may have already shipped this, and you want to check before investing more time
+- You suspect someone has already shipped this and want to check before investing more time
+- You've built something and want to package it the way currently-trending skills are packaged
 
 ## Quick start
 
@@ -39,4 +48,4 @@ gh auth login
 That's it. lazydrop takes over from there.
 
 ---
-Open-source under the [MIT License](LICENSE) — license name, not an institutional affiliation · built by [@gagaein](https://github.com/gagaein) · works with Claude Code, Cursor, Codex, Gemini CLI, OpenCode, and any agent supporting [Agent Skills](https://agentskills.io). Pure Python stdlib + `gh` CLI — no npm, no Docker, no API keys.
+Open-source under the [MIT License](LICENSE) — license name, not an institutional affiliation · built by [@gagaein](https://github.com/gagaein).

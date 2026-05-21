@@ -369,6 +369,13 @@ def main():
     parser.add_argument("--desc",      default="", help="Usage description")
     parser.add_argument("--skill-dir", default=".", help="Path to skill directory to publish")
     parser.add_argument("--dry-run",   action="store_true")
+    parser.add_argument("--auto-submit-prs", action="store_true",
+                        help="Opt-in: actually submit awesome-list PRs. "
+                             "Default is OFF — most awesome-list maintainers "
+                             "(e.g. travisvn/awesome-claude-skills) auto-close "
+                             "AI-generated PRs and require ≥10 stars. PR bodies "
+                             "are still saved to memory/pr-bodies.md for manual "
+                             "submission once you have organic traction.")
     parser.add_argument("--yes",       action="store_true",
                         help="No-op in v3 (kept for backwards compatibility). "
                              "v3 is always non-interactive.")
@@ -462,11 +469,10 @@ def main():
     else:
         print(f"  [dry-run] would push {skill_dir} → {repo_url}")
 
-    # ── Step 4: Auto-submit PRs to awesome lists ──────────────────────────────
-    print("\n[4/6] Auto-submit awesome-list PRs...")
+    # ── Step 4: Generate awesome-list PR bodies (auto-submit is OPT-IN) ───────
+    print("\n[4/6] Awesome-list PR bodies...")
 
-    # Always save the fallback bodies first — if any auto-submit fails, the
-    # user has something to paste into a browser.
+    # ALWAYS save the bodies — they are the user's manual-submit artifact.
     if not args.dry_run:
         pr_bodies_path = SKILL_ROOT / "memory" / "pr-bodies.md"
         pr_bodies_path.parent.mkdir(parents=True, exist_ok=True)
@@ -476,18 +482,35 @@ def main():
             content += generate_pr_body(repo_name, args.hook, repo_url, install_cmd, target)
             content += "\n---\n\n"
         pr_bodies_path.write_text(content, encoding="utf-8")
-        print(f"  {OK_MARK} fallback bodies saved to {pr_bodies_path}")
+        print(f"  {OK_MARK} bodies saved to {pr_bodies_path}")
 
-    pr_results = []  # [(repo, ok, detail)]
-    for target in AWESOME_LISTS:
-        ok, detail = auto_submit_pr(target, repo_name, repo_url, args.hook,
-                                     install_cmd, username, args.dry_run)
-        pr_results.append((target["repo"], ok, detail))
-        if ok:
-            print(f"  {OK_MARK} {target['repo']}: {detail}")
-        else:
-            print(f"  {FAIL_MARK} {target['repo']}: {detail}")
-            print(f"       fallback: paste entry from memory/pr-bodies.md at {target['url']}")
+    pr_results: list[tuple[str, bool, str]] = []
+    if args.auto_submit_prs:
+        # Opt-in path. User has acknowledged the risk that most awesome-list
+        # maintainers auto-close AI-generated / sub-10-star PRs (travisvn rule).
+        print(f"  ⚠ --auto-submit-prs set — opening PRs. "
+              f"Expect rejection on lists that ban AI/auto submissions.")
+        for target in AWESOME_LISTS:
+            ok, detail = auto_submit_pr(target, repo_name, repo_url, args.hook,
+                                         install_cmd, username, args.dry_run)
+            pr_results.append((target["repo"], ok, detail))
+            if ok:
+                print(f"  {OK_MARK} {target['repo']}: {detail}")
+            else:
+                print(f"  {FAIL_MARK} {target['repo']}: {detail}")
+                print(f"       fallback: paste entry from memory/pr-bodies.md at {target['url']}")
+    else:
+        # Default path. Per growth research: travisvn/awesome-claude-skills
+        # and similar lists explicitly close AI-generated and sub-10-star PRs.
+        # We refuse to ship into that and burn user goodwill with maintainers.
+        # The right time to submit is after the repo earns organic stars.
+        print(f"  ↷ auto-submit OFF (default) — most awesome-list maintainers "
+              f"reject AI-generated and sub-10-star PRs.")
+        print(f"     When your repo has ≥10 stars and you want to submit:")
+        for target in AWESOME_LISTS:
+            print(f"       - Open {target['url']} → click 'Edit' on README → "
+                  f"paste your entry from memory/pr-bodies.md → open PR")
+            pr_results.append((target["repo"], False, "deferred — submit manually after ≥10 stars"))
 
     # ── Step 5: Log ───────────────────────────────────────────────────────────
     print("\n[5/6] Log publish...")
@@ -498,8 +521,12 @@ def main():
 
     print(f"\n[publish] done.")
     print(f"  repo: {repo_url}")
-    print(f"  PRs:  {ok_count}/{len(pr_results)} submitted automatically"
-          + (f", {fail_count} need manual submit (memory/pr-bodies.md)" if fail_count else ""))
+    if args.auto_submit_prs:
+        print(f"  PRs:  {ok_count}/{len(pr_results)} auto-submitted"
+              + (f", {fail_count} need manual submit (memory/pr-bodies.md)" if fail_count else ""))
+    else:
+        print(f"  PRs:  {len(pr_results)} bodies saved to memory/pr-bodies.md — "
+              f"submit manually after the repo earns ≥10 organic stars.")
 
 
 if __name__ == "__main__":

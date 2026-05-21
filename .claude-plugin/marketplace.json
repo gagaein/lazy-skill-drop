@@ -1,0 +1,24 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "lazy-skill-drop",
+  "description": "Claude skill authoring assistant: GitHub competitor recon, differentiated architecture proposal, and one-confirm publish.",
+  "owner": {
+    "name": "gagaein",
+    "url": "https://github.com/gagaein"
+  },
+  "plugins": [
+    {
+      "name": "lazy-skill-drop",
+      "description": "Help me build a new Claude skill. Researches GitHub for existing skills doing similar work, drafts a differentiated architecture using the structural patterns of currently top-installed skills, then publishes to GitHub with one confirmation.",
+      "source": "./",
+      "category": "productivity",
+      "tags": [
+        "claude-skill",
+        "skill-authoring",
+        "competitor-analysis",
+        "github-publish",
+        "scaffolding"
+      ]
+    }
+  ]
+}

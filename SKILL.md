@@ -328,7 +328,7 @@ Read `references/anti-ai-patterns.md` for the current forbidden word list.
 
 ## Phase D — Confirm (ONE stage, content only)
 
-Publishing has exactly one gate: the user approves the content. Target account, repo creation, and awesome-list PRs all run automatically after that gate passes.
+Publishing has exactly one gate: the user approves the content. Target account and repo creation run automatically after that gate passes. **Awesome-list PRs are NOT auto-submitted** — their bodies are saved for manual submission once the repo earns ≥10 organic stars (most awesome-list maintainers auto-close AI-generated / sub-10-star PRs, per their CONTRIBUTING rules).
 
 ### Stage 1 — content confirm
 
@@ -337,7 +337,7 @@ Show the user, in order:
 1. The README draft (full text, not folded)
 2. The SKILL.md draft (full text, not folded)
 3. Proposed repo name (default: skill's `name` field from frontmatter)
-4. A target summary line: `Will publish to github.com/{username}/{repo} and auto-submit PRs to 3 awesome lists as {username}.`
+4. A target summary line: `Will publish to github.com/{username}/{repo} as {username}. Awesome-list PR bodies will be saved to memory/pr-bodies.md for manual submission once you reach ≥10 stars.`
    (Resolve `{username}` with `gh api user --jq .login` before showing. If auth fails, trigger First-time setup and come back.)
 
 Then ask exactly: **"Content looks good? (y / tell me what to change)"**
@@ -369,16 +369,16 @@ python3 scripts/publish.py \
 2. Privacy scan (blocks on secrets / personal paths / emails)
 3. `gh repo create` + topics
 4. `git init / commit / push`
-5. **Auto-submit PRs** to each of the 3 awesome lists: `gh repo fork` → clone → insert entry under the target section → push branch → `gh pr create`. Per-list failures do NOT abort — they are logged and reported at the end.
+5. **Save awesome-list PR bodies** to `memory/pr-bodies.md`. Auto-submission is **OFF by default** — most awesome-list maintainers (e.g. `travisvn/awesome-claude-skills`) auto-close AI-generated and sub-10-star PRs. Submitting before the repo earns organic stars burns the user's reputation with the curators they need. Only auto-submit when the user explicitly opts in with `--auto-submit-prs` AND has acknowledged the rejection risk.
 6. Append to `memory/performance-log.md`
 
 When it returns, show the user:
 
 1. The GitHub repo URL (clickable)
-2. One line per awesome list: either the PR URL or "failed — see memory/pr-bodies.md to submit manually"
+2. A one-line note: "PR bodies saved to `memory/pr-bodies.md` — submit manually once you reach ≥10 stars by opening each awesome-list repo's README in the browser and pasting your entry." (If `--auto-submit-prs` was set, instead show one line per list: PR URL on success, fallback instruction on failure.)
 3. The performance-log entry
 
-If any awesome-list PR failed, surface that clearly — do not pretend all three went through. The saved `memory/pr-bodies.md` is the fallback so the user can paste the entry into a browser PR if needed.
+Never frame the default as a failure. The default is correct: lazy-skill-drop refuses to ship into maintainer-rule violations on the user's behalf. The user can re-run `publish.py --auto-submit-prs` later, after the repo has earned the ~10-star threshold, to take the opt-in path.
 
 ---
 
